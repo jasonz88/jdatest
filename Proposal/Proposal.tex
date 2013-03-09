@@ -1,0 +1,406 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[breaklinks=true,bookmarks=false]{hyperref}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+%\ifcvprfinal\pagestyle{empty}\fi
+\setcounter{page}{1}
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{Early Computer Architecture Performance Evaluation with Probabilistic Nearest-Neighbour and Clustering Techniques}
+
+\author{Jeremy Aaron Joachim\\
+Univsersity of Texas at Austin\\
+1 University Station  Austin, TX 78712\\
+{\tt\small jajoachim@gmail.com}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+}
+
+\maketitle
+%\thispagestyle{empty}
+
+%%%%%%%%% ABSTRACT
+\begin{abstract}
+
+There are performance enhancements every year in the computer architecture world due to innovation, better hardware to exploit parallelism, smaller technologies, and much more.
+However, there are two caveats that should be examined.
+First, cutting edge processors are not always the best solution for many environments.
+Many applications attempt to minimize cost and power while achieving minimum performance requirements.
+Second, performance measurement is a fickle business.
+SPEC benchmarks dominate performance measurements of processors currently, but running the entire 29 benchmark suite is simply not possible in early performance evaluation.
+This is especially true in the design phase when engineers wish to speculate the performance of the processor design with some degree of accuracy without having the actual hardware realization.
+
+This paper offers a very fast solution with reasonable accuracy that can probabilistically determine benchmark runtimes with a very basic set of hardware characteristics.
+Performance results from the SPEC database are examined to find correlations between different hardware configurations and benchmark runtimes.
+With this training data, we can approximate these correlations and make predictions about processors with even the most basic sets of hardware descriptions.
+
+\end{abstract}
+
+%%%%%%%%% BODY TEXT
+\section{Introduction}
+
+Performance evaluation is always a laborious task for computer architects, but it is a very essential component to architecture design.
+The performance of a processor needs to be modeled both accurately and quickly during the entire design phase in order to produce desired results.
+Most evaluation is done with software emulators with varying degrees of granularity.
+Some emulators are cycle accurate, whereas others give a larger overview.
+While these emulators are very useful for performance evaluation during the design phase, they are harder to use during the earliest stages when the designs are first being proposed.
+Instead, this paper proposes a probabilistic method that attempts to draw concluses from broad correlations between hardware components and benchmark runtimes.
+
+%In the earliest design phases, the hardware details are not described very well.
+%This makes gauging early performance a very vague task.
+%By this point, there are some basic hardware components that are known about the design and not much else.
+%These hardware components can range from general characteristics like clock frequency and cache size to instruction window length, eviction policies, and a few intimate details.
+%While this little data is not very sufficient alone, past results with various similar parameters can be used to quickly speculate the performance of the machine.
+
+The method used in this paper is an application of a basic method used in probability to determined classes based on characteristics.
+It mostly utilizes K-Nearest Neighbors (KNN) and K-Means Clustering (KMC) for its classification.
+The method can be used to speculate benchmark runtimes based on hardware descriptions.
+The intended use is to help computer architects gauge performance early in the design phase so that they may focus their efforts on a smaller set of possible hardware specifications.
+
+Alternatively, the same method can be used to speculate hardware characteristics from benchmark runtimes.
+This turns out to be an easier problem to solve, albeit less useful.
+It is a good technique to use when searching for a minimal set of hardware that matches a specified performance level.
+This can be useful for clients shopping for a processor or help architects decided a starting design to work with.
+
+This paper analyzes the stated problem in much more detail, as well as the proposed solution for both situations described.
+To show its effectiveness, SPEC results are taken from the SPEC database in order to use as training and testing sets.
+Subsequent sections will examine the accuracy of the suggested methods, and future work that can potentially improve the results.
+
+%-------------------------------------------------------------------------
+\section{Background}
+
+The data used in this paper comes from the SPEC CPU2006 benchmarking suite results.
+SPEC CPU is a common benchmarking suite to measure the performance of processors ~\cite{SPEC_Results}.
+It comes with 29 different programs that represent a characteristic workload.
+There are 12 integer programs (SPECint), and 17 floating point programs (SPECfp).
+The time taken to execute each program is used to compute various performance factors.
+This paper examines the results from the 2006 suite.
+In total, there are 4221 integer samples and 4199 floating point samples from various processors within the SPEC database.
+The results are execution times for three attempts per benchmark.
+The final results that this paper uses is the reported median results for each benchmark.
+
+Accompanying these benchmark runtimes is a short description of basic hardware attributes.
+The common hardware aspects found in all submitted results are DRAM (GB), number of CPU cores, clock frequency (MHz), autoparallel hardware support, and primary cache size (KB).
+DRAM (Dynamic Random Access Memory) is the system’s main memory size where data is kept.
+The number of CPU cores is the count of how many cores a single chip has.
+Clock frequency is how fast the entire system latches data paths.
+Clock frequency is commonly misunderstood as the generic speed metric.
+Finally, there is primary cache size, which is a small amount of memory residing very close the CPU that is used to stash commonly accessed memory locations for quick referencing.
+
+%-------------------------------------------------------------------------
+\section{Methodology}
+
+First, the granularity of the problem must be addressed.
+The class sets contain many unique instances that will degrade the speculation accuracy while having little extra significance to the result.
+For instance, the DRAM class has 27 unique values within SPECfp alone.
+In order to reduce redundancy and complexity of these class sets, each class is binned into 8 values.
+This allows most classes such as CPU core count, autoparallel support, and primary cache size to retain their highest granularity while reducing the amount of unique classes in memory and clock frequency.
+For these remaining two classes, a linear span of 8 bins is spread across the range of their values.
+The class values are renamed to the bin number in which they are categorized.
+
+It is important to have a deeper understanding of the problem before solving it.
+There is obviously a correlation between benchmark runtime performance and hardware quality, however the performance correlation is not so simple with so many dimensions.
+In the floating point suite, the problem becomes a 17 dimensional problem with each benchmark becoming a dimension for each hardware configuration.
+Principle Component Analysis (PCA) is a common method to reduce the dimensionality of a problem by extracting correlations between dimensions.
+The variance within each PCA dimension can help tell if the data is being represented in its entirety.
+The more variance retained within a set of dimensions, the better the data is represented.
+
+PCA is used to represent the benchmark data in this problem in 2 dimensions.
+Each hardware configuration is a sample point, with the benchmark runtimes serving as the coordinates.
+Both SPECint and SPECfp retain about 80\% of the set’s variance within the first two dimensions, however SPECfp retains most of it in just the first dimension.
+The floating point benchmark suite is chosen as a showcase for this paper to better understand the problem graphically.
+
+Figure \ref{fig:fpPrimCache} shows a zoomed in section of the densest area within the 2 dimensional PCA of SPECfp.
+The spread of points shows little clustering potential as a whole, however individual hardware aspects cluster slightly better.
+In this plot, the different colors of each point indicate the different cache sizes in each point’s hardware configuration.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{GH_FP_Primary_Cache.png}
+\caption{PCA of SPECfp, color coded by primary cache size.}
+\label{fig:fpPrimCache}
+\end{figure}
+
+Figure \ref{fig:fpPrimCache256KB} shows a good example of how individual hardware aspects can cluster their benchmark runtimes.
+The shown data points are only for hardware configurations with 256KB primary cache.
+With simple clustering, it is easy to see the how the other hardware configurations can greatly affect which cluster the benchmark runtimes fall under.
+When considering the goal of this project, it is very important to note that similar hardware configurations can map to many different clusters of benchmark runtimes.
+This is the primary cause of complexity for this problem.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{GH_FP_Primary_Cache_256KB.png}
+\caption{PCA of SPECfp, 256KB cache sizes only.}
+\label{fig:fpPrimCache256KB}
+\end{figure}
+
+For this reason, the methods described in this paper use 25\% of the data as a training set.
+This sizeable amount of samples is more than enough to achieve accurate prior probabilities.
+More importantly, it also supplies a sufficient amount of data to capture most of these clusters created by hardware configurations.
+
+Additionally, it should be noted that both Maximum Likelihood (MLE) and Linear Discriminate (LD) methods are highly undesirable for this kind of classification.
+MLE would require a PDF for every class value, and each PDF would be 12 dimensions.
+The 12 dimensional PDFs can be broken up by each dimension, however this does not simplify the problem much.
+Even with a maximum of 8 bins per class, this means that 4 class have 8 values each, and each value has 12 PDFs.
+This is a grand total of 384 PDFs to track.
+To make matters worse, even the large sample set could not confidently fill all of these PDFs with reliable values.
+LD has a problem with the many to one mapping of benchmark clusters to hardware configurations.
+Not only would the boundaries be numerous for each class, but the overlapping boundaries of each cluster would only make matters worse.
+KNN, on the other hand, becomes an ideal solution for this problem becaise it avoids these boundary complexities while handling multiple clusters well.
+Distance is measured with Euclidean distance, however Manhattan (or Cityblock) distance was also tested and produced nearly identical results in all cases.
+
+%-------------------------------------------------------------------------
+\section{Hardware Speculation}
+
+Speculating hardware performance from a set of benchmark runtimes is fairly straightforward using KNN.
+By finding the nearest neighbor to the specified runtimes, we can figure out the cluster to which the point belongs.
+The hardware configuration of that cluster is then used to speculate the hardware of the specified point.
+Many clusters are overlapping, so initially it seems that figuring out which of the overlapping clusters the point belongs to may prove difficult.
+
+Various methods were used to determine the cluster to which the point belonged.
+They were generally different flavors of voting, where the nearest k neighbors all voted for their own clusters.
+The cluster with the highest votes gains ownership of the specified point.
+Varying amounts of neighbors used had some inconsistent affects on accuracy of the results.
+
+Surprisingly, it was determined that using 1 neighbor proved to be by far the most accurate.
+I believe this is caused by the variance in each cluster’s size and population.
+Since neither are bounded, oddly large clusters with high populations may become dominant in the voting method and negatively impact results.
+Finding only the first nearest neighbor reduces the impact of these effects. 
+
+In this way, each hardware component is separately speculated and the final results are concatenated to produce a complete hardware configuration.
+It should be noted that this independent speculation does somewhat ignore the inter-dependence between hardware components which can potentially refine the results further.
+This is discussed in more detail in the next section.
+
+\subsection{Hardware Speculation Results}
+
+The error results of hardware speculation can be found in Figure \ref{fig:GHfpError}.
+All of the error rates are respectably low with the highest being DRAM with about 15\% error.
+Since the hardware components were classified separately, the error result can give some indication of how indicative each component is to benchmark runtime performance.
+Components with higher rates of error are less correlated with benchmark runtimes, whereas components with lower error rates are more correlated.
+From the error chart, it can be determined that DRAM and number of cores per chip are less influential, whereas primary cache size is extremely important.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{GH_FP_Error_Rates.png}
+\caption{SPECfp Hardware Speculation Error.}
+\label{fig:GHfpError}
+\end{figure}
+
+These results further agree with how the SPEC benchmarks are actually designed.
+All of the benchmarks only require 1GB of DRAM space, which is the lowest bin of the DRAM class.
+Every hardware configuration satisfied this constraint.
+While the speed of the DRAMs may vary, this is not considered in this study (the information was not present in all of the submitted results).
+Essentially, this means Memory has no impact on these benchmarks’ performance.
+This is the main reason the Memory class has the highest error rate.
+
+Similarly, the number of CPUs on a single chip is largely irrelevant.
+With the exception of a few SPECfp programs, the vast majority of SPEC benchmarks are designed to be single threaded.
+Having more cores cannot exploit any more additional parallelism and therefore has very little impact on benchmark performance.
+
+On the other hand, primary cache sizes have been shown to contribute a large amount of performance to systems.
+Most CPUs can process data far faster than memory can supply data, so most applications become bandwidth bound by memory.
+This is true of many SPEC programs.
+Larger caches mean more cache hits, which leads to fewer DRAM accesses and shorter memory latency.
+
+However, both Memory and core count classes exhibit very low error rates even with 8 class values each.
+Most systems with large primary cache sizes also have multiple cores and memory sizes.
+This is mostly true for all types of configurations, where hardware parameters are very closely correlated.
+The accuracy of these two mostly irrelevant hardware classes is completely due to this strong hardware inter-dependence.
+
+%-------------------------------------------------------------------------
+\section{Benchmark Runtime Speculation}
+
+Speculating benchmark runtimes is a far more difficult problem, and it is the primary focus of this paper.
+The best method explored is again KNN for the reasons mentioned before, but there are some caveats to observe.
+The goal is to not only identify which cluster a given hardware configuration’s benchmarks will fall under, but the location within that cluster as well.
+There are two primary reasons why this goal becomes far more complex than the previous section.
+
+First, it should be noted that the specified hardware configurations that need benchmark runtime speculations may not be one that is contained in sample set.
+Simply choosing the closest hardware configuration is not good enough; the cluster locations are very sensitive to hardware configurations.
+Furthermore, some hardware aspects such as primary cache size carry a heavier weight in this sensitivity and cannot be changed too much.
+A mean of clustered neighbors should determine the final position.
+
+Second, the many to one mapping of benchmark runtime clusters to hardware configurations is very difficult in the reverse direction; it is hard to decide which cluster the benchmark speculation should reside in.
+To make matters worse, incorrectly guessing the cluster can result in an atrocious error rate in all 12 benchmark dimensions.
+Three methods were explored, however only two will have their results displayed.
+
+\subsection{Indepedendent Cluster Convergence}
+
+The first method generated s nearest neighbors for each individual hardware aspect.
+The idea is to find the most overlapping clusters of benchmark runtimes (the location where all hardware components converged on).
+This performed poorly because the clusters actually rarely all overlapped in the same place consistently.
+Instead, there would be many locations where various subsets of hardware clusters overlapped, and it was very hard to make an accurate decision.
+Additionally, it ignores valuable information in hardware inter-dependencies.
+
+\subsection{Mean of K-Nearest Neighbors}
+
+The second method finds k nearest neighbors to the entire hardware configuration vector.
+To improve the results, the classes are no longer binned.
+This allows high granularity within the training samples to truly find the closest hardware configurations.
+One complication that arises from this is the hardware parameter values.
+CPU clock frequency is in the GHz range, primary cache size is in the KB range, and core count is generally less than 32.
+There are a few ways to normalize the values, but the zero score method was used for this paper.
+This takes each individual hardware component and subtracts the mean and divides by the variance.
+This puts all of the hardware components within a similar range.
+
+These nearest neighbors are now the benchmark runtimes of the closest hardware configurations.
+The best results were yielded from 10 times the amount of class sets.
+This makes a total of 50 nearest neighbors taken into account.
+The mean of these nearest neighbors is taken as the final speculated result.
+
+Figure \ref{fig:GBTMeanError} displays the error rates for this method in SPECint.
+It should be noted that the benchmark “libquantum” is exclude from this error chart.
+The error in that benchmark is large enough to scale the other error rates to obscurity.
+The error for this benchmark will be displayed in a later section.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{GBT_INT_MEAN_Average_Error_No_Libquantum.png}
+\caption{KNNM SPECint Error. Libquantum is excluded.}
+\label{fig:GBTMeanError}
+\end{figure}
+
+The error rates were fairly bad, however acceptable given the complexity of the problem and the limited information about each hardware configuration.
+One major problem arises once again from the sparse cluster locations.
+Some of the nearest neighboring hardware configurations generate benchmark runtime points that are far from any previously seen cluster.
+This skews the arithmetic mean noticeably.
+Figure \ref{fig:MeanClassifyExample} shows an illustration of one such example.
+The points are benchmark runtimes generated from the nearest hardware configurations and plotted in a 2 dimensional PCA.
+The triangle ($\Delta$) represents the speculated result, which is the mean of all the points.
+The asterisk (*) represents the actual result.
+Note how the outlying points skewed the average away from the correct result.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{GBT_INT_MEAN_Classify_Example.png}
+\caption{KNNM Speculation Example.}
+\label{fig:MeanClassifyExample}
+\end{figure}
+
+\subsection{K-Means Clustering of K-Nearest Neighbors}
+
+The third method attempts to fix the skewed mean problem.
+By applying KMC to the KNN in the previous sections, different points can be sectioned off in an attempt to guess the actual clusters represented by the points.
+The cluster with the highest population is chosen as the correct cluster, and the KMC node (which is the mean of the cluster) is chosen as the speculated result.
+This is similar to KNN with voting.
+Figure \ref{fig:ClusterClassifyExample} shows an example of implementing the K-Means Clustering modification.
+The K-Means Cluster nodes are indicated by an open circle (O), and the cluster bounds between these nodes is indicated by colored intersection lines.
+The result is similar to the one in the previous section, however notice that the highest density cluster’s mean brings the result closer to the true result.
+It was empirically determined that a good amount of KMC nodes is the number of classes minus one.
+In this case, the cluster count is set to 4. 
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{GBT_INT_CLUSTER_Classify_Example.png}
+\caption{KNNM with Clustering Speculation Example.}
+\label{fig:ClusterClassifyExample}
+\end{figure}
+
+This modification shifts the errors in two ways.
+First, the individual error percentages are scaled by a factor of 0.8 which is a considerable improvement.
+Second, the general error percentage distribution is less accumulated around 60\%-80\% and shifted to the extremes instead.
+Some samples became far more erroneous, whereas others become far more accurate (some as low as 0.5\%).
+This makes erroneous results easier to catch, leaving room for future modifications to this classifier.
+It is important to note that the KMC algorithm used in this paper involves randomly sampling the points to determine node locations.
+This can cause small fluctuations in error between classification runs.
+On a positive note, the differences are very marginal.
+
+The average errors generated from this classification method display an interesting behavior.
+Figure \ref{fig:ErrToRunComp} shows a comparison between the average errors (with libquantum included) in each benchmark, and a SPECint benchmark report.
+The SPECint report graphically displays the runtimes of each benchmark; longer bars means longer runtime.
+Note that the error magnitude is correlated with the benchmark runtimes.
+The error calculation is display in Equation \ref{eq:ErrEq}.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.95\linewidth]{ErrorToRuntimeComparison.png}
+\caption{Comparison between error and benchmark runtimes. Libquantum is included}
+\label{fig:ErrToRunComp}
+\end{figure*}
+
+\begin{displaymath}
+Error=\frac{|Speculated-Real|}{Real}*100\%
+\label{eq:ErrEq}
+\end{displaymath}
+
+Despite being divided by the real runtime, the error still seems to grow linearly as the benchmark runtime increases.
+This means that the speculated runtime ranges grow with a square relationship to the real runtime.
+There are a couple explanations of this.
+
+As the benchmark runtime range increases, the possible speculated results also increases.
+With a larger class set, it is harder to make correct decisions and errors are prone to increase.
+In this case, a benchmark with a large range of values greatly influences a point’s 12 dimensional location.
+The clusters of benchmark runtimes that correlate to hardware configurations are somewhat related to each other.
+Different clusters may have some benchmarks with the same runtimes, while differing in a few others.
+This also means that the wrong cluster can be chosen, but some benchmark runtimes may still be speculated correctly.
+A benchmark that has a very large range of possible values, however, will take more unique values across many clusters.
+While mistaking the cluster for a few smaller benchmarks may be okay, long running benchmarks like libquantum must have the correct cluster chosen or else the speculated value will surely be wrong.
+
+The variance of a benchmark’s runtime also naturally increases as its average runtime ranges increase.
+Random variables with high variance require more samples to accurately characterize.
+While using 25\% of the data set as training data works for many of the smaller benchmarks, longer benchmarks like libquantum may not quite be fully characterized.
+Even worse, some clusters may not even be represented by this sample set which further greatly increases errors in some classifications.
+
+%------------------------------------------------------------------------
+\section{Conclusion}
+
+In this paper, it was shown that a simple KNN classifier method can predict hardware based off of benchmark runtimes, and the reverse as well with reasonable accuracy.
+With this kind of data, it was shown that KMC can help improve the classification results from KNN.
+While less accurate, using these kinds of probabilistic techniques are far faster than creating software simulators for these systems in the early design phase.
+The classifiers used in this paper can give a back-of-the-envelope estimate of benchmark runtime performance with just very broad hardware descriptions.
+
+%-------------------------------------------------------------------------
+\section{Future Work}
+
+The classifier used to speculate benchmark runtimes has much room for improvement.
+The blatantly erroneous results can be detected and dropped to help further improve accuracy.
+Furthermore, cluster voting is very naive in this paper.
+Rather than use cluster sizes and densities, only population is considered.
+The actual size of each cluster should be taken into account in addition to population to calculate cluster densities.
+Using cluster densities should provide better results, since it will eliminate larger sparse clusters from being considered.
+While these large sparse clusters are still somewhat valid, less is gained by guessing them correctly because their means are skewed by high variance points.
+It would be better to look at smaller and denser clusters to arrive at even more accurate results.
+
+The main obstacle found throughout this paper is the many to one mapping of benchmark runtime clusters to hardware configurations.
+The data used in this paper has very broad descriptions.
+The intricate optimizations in hardware is what causes CPU speedups in computer architecture, but they are not described in the submitted benchmark runtime results.
+These optimizations cause similar hardware configurations to have varied runtime clusters.
+A similar study to the one in this paper should be done with far more hardware characteristics that can capture more unique properties within each hardware configuration.
+Some of the characteristics should be more detailed parameters like instruction window sizes, reorder buffer size, pipeline depth, and  similar characteristics.
+This will reduce the multiple benchmark cluster problem and provide even better results.
+
+Finally, it would be helpful to know the runtime inter-dependences between benchmarks.
+The similarities between benchmarks is explored in ~\cite{SPEC_Anal}, however they use more low level components such as cache activity and instruction mix.
+For the type of analysis done in this paper, it would be worth looking at much higher level correlations between benchmark runtimes.
+This additional information can help further increase the accuracy of benchmark runtime speculations with a way to spot erroneous results and further reduce the amount of potential benchmark runtime clusters.
+
+%-------------------------------------------------------------------------
+
+{\small
+\bibliographystyle{ieee}
+\bibliography{FinalReport}
+}
+
+\end{document}

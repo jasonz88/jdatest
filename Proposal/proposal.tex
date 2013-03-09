@@ -1,0 +1,61 @@
+\documentclass{article}
+
+%\usepackage{colt11e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{pseudocode}
+\usepackage{dsfont}
+\usepackage{graphicx}
+\usepackage{url}
+
+%\input{Macros}
+
+\title{Java Program Execution Analysis Tool}
+
+\author{
+  Dongyang Zhang \\
+  {\fontsize{10}{11}\selectfont University of Texas, Austin}\\ 
+  \texttt{dyz@utexas.edu}
+\and
+  Jeremy Joachim \\
+  {\fontsize{10}{11}\selectfont University of Texas, Austin}\\ 
+  \texttt{jajoachim@gmail.com}
+}
+
+\begin{document}
+\maketitle
+\section{Problem statement}
+
+We are to build a Java program execution profiling tool.
+The tool will be based on instrumentation of Java bytecode using ASM.
+With the help of the GUI tool, users can easily track a Java program's execution dynamically and see all the related statistics for point of interest at run time.
+In addition, the tool is supposed to show the difference between two executions of the same program in terms of path hotness.
+The end goal will be to display execution graph paths, show hotspots, tracking CPU utilization, memory footrprint as well as other metrics.
+
+What we want is to apply the software testing knowledge in building the tool such that it would facilitate test cases generation and provide relevant coverage suggestions in test cases.
+Another advantage is that our tool could easily be morphed into a hotline fault detecting tool with test inputs.
+
+\section{Related tools}
+
+Java profiling tool has been an object of development for some time.
+Jmap \cite{Oraclejmap} developed by Oracle focused on printing shared object memory maps or heap memory details.
+It is able to show object counts, increases of java class with little delay even for very large JVM heaps.
+The same for other memory analyzer tool e.g. \cite{MAT}.
+Another tool is the VisualVM \cite{VisualVM} built in the JVM.
+the creators described it as a visual tool integrating several command line JDK tools and lightweigth profiling capabilities.
+It enables gathering statistics throughout normal application execution rather than sampling information at intervals.
+The downside is the profiler is brute-force and it redefine most of the classes and methods.
+BTrace \cite{BTrace} can let the user specify what type of information they want to gather by scripts.
+The benefit is BTrace script is just a normal Java class containing some special annotations to specify where and how BTrace will instrument the application.
+Then BTrace Scripts are compiled into standard .
+class files by its compiler.
+The drawback is the design makes it difficult to navigate output format to better process the data.
+Later tools e.g. EurekaJ \cite{EurekaJ} provides better visualization and parsing of the statistics.
+ther commercial tools e.g. JProfiler \cite{JProfiler} support more extensive profiling including hihger level profiling data, database profiling, analysis of memory leaks, QA capabilities as well as integrated thread profiler.
+
+\section{Proposed solution}
+
+
+\bibliographystyle{plain}
+\bibliography{proposal}
+\end{document}
