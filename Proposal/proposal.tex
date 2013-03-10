@@ -24,16 +24,69 @@
 
 \begin{document}
 \maketitle
-\section{Problem statement}
 
-We are to build a Java program execution profiling tool.
-The tool will be based on instrumentation of Java bytecode using ASM.
-With the help of the GUI tool, users can easily track a Java program's execution dynamically and see all the related statistics for point of interest at run time.
-In addition, the tool is supposed to show the difference between two executions of the same program in terms of path hotness.
-The end goal will be to display execution graph paths, show hotspots, tracking CPU utilization, memory footrprint as well as other metrics.
+\section{Introduction}
+
+Software testing has always been a fickle yet vital task for product assurance.
+As a result of growing software complexity, software testing has become a very expensive process for any programming language.
+Java is one such language, and many profiling hooks to the Java Virtual Machine's (JVM) inner workings are made readily available for debugging tools to exploit.
+Furthermore, the Java language has many constraints not found in complex langauges like C++ that allow code analysis to be more concise and straightforward.
+
+\section{Problem Statement}
+
+We aim to build a Java program execution profiling tool that instruments the Java bytecode using the ASM library.
+The tool's main purpose will be to help view code coverage and map the code to a node graph.
+With the help of a GUI tool, users will be able to track a Java program's execution and see both static and dynamic statistics.
 
 What we want is to apply the software testing knowledge in building the tool such that it would facilitate test cases generation and provide relevant coverage suggestions in test cases.
 Another advantage is that our tool could easily be morphed into a hotline fault detecting tool with test inputs.
+
+\section{Objectives}
+
+Within the two main types of program analysis, static and dynamic, we wish to complete a small list of objectives.
+In static analysis, we wish to display a basic block node map of the program.
+Static analysis is mostly for visualization.
+
+Dynamic analysis is the main goal of this project.
+The primary dynamic analysis objective in this project is to track method calls, timings, and inter-method paths.
+Additionally, the program will introduce a unique tool to display the difference between two executions of the same map.
+If time persists, we would also like to perform CPU usage and memory footprint analysis on classes and methods within a program.
+The following sections will describe our current plans for each implementation in both static and dynamic analyses.
+
+\subsection{Static Analysis}
+
+The profiler will parse all classes within a program and create a node map.
+Each node will represent a basic block, but method calls will be in separate nodes.
+Each node will be able to be expanded into bytecode instructions.
+In the case of method call nodes, they will either jump to the method's node tree or simply display the bytecode that calls the method.
+
+At this point, we could also offer synatictic pathfinding, however the importance of such a function seems limited.
+It could help show possible paths between methods, however semantic paths from execution are generally much more important.
+We will only implement this functionality if time allows us.
+
+\subsection{Dynamic Analysis}
+
+Each method will keep a set of simple paths executed with each method call.
+Knowing the amount of times each path was execution also shows how many times each node and edge is executed.
+However, loops and repeated nodes will have to be handled in a special manner that has not yet been decided.
+We are currently thinking of keeping them as a special node within a path that represets a subset nodes.
+
+Method timing will be implemented with two 64 bit counters.  
+One counter accumulates the total time spent in the method during execution (we will aim for nanosecond accuracy).
+The other counter keeps track of how many calls to the method there are.
+When the program needs to display the average time spent in a method, it only has to divide the two numbers.
+Methods with recursive calls may yield skewed results.
+Additionally, very short methods that will have runtimes in the timer's noise range will be excluded.
+Their timings can be extrapolated from methods that call these smaller ones.
+
+Finally, we will offer a display showing the difference between two executions of a program.
+This will be implemented by first normalizing all of the timings of each method in both executions.
+Next, a subtraction is performed between the two programs' method timings.
+The difference in normalized timings will show the difference in program hotspots in two different executions.
+
+CPU utilization and memory footprints are a bit more complicated to track; these are low level statistics that are not as readily available from the JVM.
+There hooks that allow some limited functionality, but multithreaded applications will cause additional complexity.
+We will only implement this functionality if time allows us.
 
 \section{Related tools}
 
@@ -53,7 +106,11 @@ The drawback is the design makes it difficult to navigate output format to bette
 Later tools e.g. EurekaJ \cite{EurekaJ} provides better visualization and parsing of the statistics.
 ther commercial tools e.g. JProfiler \cite{JProfiler} support more extensive profiling including hihger level profiling data, database profiling, analysis of memory leaks, QA capabilities as well as integrated thread profiler.
 
-\section{Proposed solution}
+\section{Conclusion}
+Conclusion goes here.
+It will conclude things.
+Concluding things is good.
+That concludes this paper.
 
 
 \bibliographystyle{plain}
