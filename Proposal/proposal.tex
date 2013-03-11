@@ -35,21 +35,21 @@ Furthermore, the Java language has many constraints not found in complex langaug
 \section{Problem Statement}
 
 We aim to build a Java program execution profiling tool that instruments the Java bytecode using the ASM library.
-The tool's main purpose will be to help view code coverage and map the code to a node graph.
-With the help of a GUI tool, users will be able to track a Java program's execution and see both static and dynamic statistics.
-
-What we want is to apply the software testing knowledge in building the tool such that it would facilitate test cases generation and provide relevant coverage suggestions in test cases.
-Another advantage is that our tool could easily be morphed into a hotline fault detecting tool with test inputs.
+The tool's main purpose will be to help view code coverage, especially in the context of test run, and map the code to a node graph.
+Larger performance tests will also benefit from this tool by showing the hotspots in code.
+This will allow the client to visualize what parts of the code should be optimized.
 
 \section{Objectives}
 
 Within the two main types of program analysis, static and dynamic, we wish to complete a small list of objectives.
 In static analysis, we wish to display a basic block node map of the program.
-Static analysis is mostly for visualization.
+This is to help the client visualize the branches in their project and the interactions in the object heirarchy.
+This phase could benefit from a syntactic pathfinding tool to see if different nodes can connect, however the importance of such a function seems limited. 
 
 Dynamic analysis is the main goal of this project.
-The primary dynamic analysis objective in this project is to track method calls, timings, and inter-method paths.
-Additionally, the program will introduce a unique tool to display the difference between two executions of the same map.
+The primary dynamic analysis objective in this project is to track method calls, method timings, and inter-method paths.
+Additionally, the program will introduce a unique tool to display the difference between two executions of the same code.
+Showing the difference between executions can show how the code reacts to different inputs.
 If time persists, we would also like to perform CPU usage and memory footprint analysis on classes and methods within a program.
 The following sections will describe our current plans for each implementation in both static and dynamic analyses.
 
@@ -60,8 +60,8 @@ Each node will represent a basic block, but method calls will be in separate nod
 Each node will be able to be expanded into bytecode instructions.
 In the case of method call nodes, they will either jump to the method's node tree or simply display the bytecode that calls the method.
 
-At this point, we could also offer synatictic pathfinding, however the importance of such a function seems limited.
-It could help show possible paths between methods, however semantic paths from execution are generally much more important.
+Pathfinding in a linked graph can be done with Dijkstra's algorithm.
+The nodes could be either be weighted based on code complexity within each basic block, or all nodes have uniform weight.
 We will only implement this functionality if time allows us.
 
 \subsection{Dynamic Analysis}
@@ -84,34 +84,35 @@ This will be implemented by first normalizing all of the timings of each method 
 Next, a subtraction is performed between the two programs' method timings.
 The difference in normalized timings will show the difference in program hotspots in two different executions.
 
-CPU utilization and memory footprints are a bit more complicated to track; these are low level statistics that are not as readily available from the JVM.
+CPU utilization and memory footprints are a bit more complicated to track; these low level statistics are not as readily available from the JVM.
 There hooks that allow some limited functionality, but multithreaded applications will cause additional complexity.
 We will only implement this functionality if time allows us.
 
 \section{Related tools}
 
-Java profiling tool has been an object of development for some time.
-Jmap \cite{Oraclejmap} developed by Oracle focused on printing shared object memory maps or heap memory details.
-It is able to show object counts, increases of java class with little delay even for very large JVM heaps.
-The same for other memory analyzer tool e.g. \cite{MAT}.
-Another tool is the VisualVM \cite{VisualVM} built in the JVM.
-the creators described it as a visual tool integrating several command line JDK tools and lightweigth profiling capabilities.
+Java profiling tools have been an object of development for some time.
+Jmap \cite{Oraclejmap}, developed by Oracle, focused on printing shared object memory maps or heap memory details.
+(NEEDS IMRPOVEMENT) It is able to show object counts, increases of java class with little delay even for very large JVM heaps.
+The same functionality can be found in other memory analzying tools such as in \cite{MAT}.
+
+Another notable profiling tool is the VisualVM \cite{VisualVM} built in the JVM.
+the creators described it as a visual tool integrating several command line JDK tools and lightweight profiling capabilities.
 It enables gathering statistics throughout normal application execution rather than sampling information at intervals.
-The downside is the profiler is brute-force and it redefine most of the classes and methods.
+This is the kind of instrumentation our profiler will aim to do.
+The downside that is the profiler is brute-force and it redefine most of the classes and methods.
+
 BTrace \cite{BTrace} can let the user specify what type of information they want to gather by scripts.
 The benefit is BTrace script is just a normal Java class containing some special annotations to specify where and how BTrace will instrument the application.
-Then BTrace Scripts are compiled into standard .
-class files by its compiler.
-The drawback is the design makes it difficult to navigate output format to better process the data.
-Later tools e.g. EurekaJ \cite{EurekaJ} provides better visualization and parsing of the statistics.
-ther commercial tools e.g. JProfiler \cite{JProfiler} support more extensive profiling including hihger level profiling data, database profiling, analysis of memory leaks, QA capabilities as well as integrated thread profiler.
+BTrace scripts are then compiled into standard class files by the compiler.
+The drawback is the design makes it difficult to navigate the output format to process the data.
+Later on, tools like EurekaJ \cite{EurekaJ} provide better visualization and parsing of the statistics.
+(EITHER NEEDS ELABORATION OR OMISSION) Commercial tools like JProfiler \cite{JProfiler} support more extensive profiling including higher level profiling data, database profiling, analysis of memory leaks, QA capabilities as well as integrated thread profiling.
 
 \section{Conclusion}
-Conclusion goes here.
-It will conclude things.
-Concluding things is good.
-That concludes this paper.
-
+The purpose of our tool is to help programmers visualize the code coverage and code utilization of test cases.
+In addition to these debugging features, the tool will also provide code hot spots during each test case.
+This can help programming find areas of code that would be best to optimize.
+(A BIT MORE HERE)
 
 \bibliographystyle{plain}
 \bibliography{proposal}
