@@ -1,5 +1,6 @@
 package org.javadynamicanalyzer;
 
+import org.javadynamicanalyzer.graph.Node;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -18,6 +19,13 @@ public class JavaDynamicAnalyzer {
 
         // note directed edges are printed as: (<v1>,<v2>)
         System.out.println(hrefGraph.toString());
+        
+        Node<Integer> n1=new Node<Integer>(5);
+        Node<Float> n2=new Node<Float>(5.0f);
+        
+        System.out.println(n1.equals(new Node<Integer>(6)));
+        System.out.println(n1.equals(n1));
+        System.out.println(n1.equals(n2));
     }
 
     private static DirectedGraph<String, DefaultEdge> createHrefGraph(){
