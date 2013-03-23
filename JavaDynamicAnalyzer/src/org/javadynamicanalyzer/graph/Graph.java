@@ -1,11 +1,10 @@
 package org.javadynamicanalyzer.graph;
 
-import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Iterator;
 
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
@@ -14,8 +13,8 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 @SuppressWarnings("serial")
 public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements Iterable<T>{
-	//Make a class to draw to JFrames
-	class Layout extends FRLayout<T, Edge<T>>{ 
+	//Make a classes to draw to JFrames
+	class Layout extends FRLayout2<T, Edge<T>>{
 		public Layout(Graph<T> g){ super(g); } 
 	}
 	class CA extends ComponentAdapter{
