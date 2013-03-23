@@ -1,18 +1,17 @@
 package org.javadynamicanalyzer.graph;
 
 public class Edge<T> {
-	Node<T> src;
-	Node<T> dst;
-	public Edge(Node<T> source, Node<T> destination){
+	T src;
+	T dst;
+	public Edge(T source, T destination){
 		src=source;
 		dst=destination;
 	}
-	@SuppressWarnings("unchecked")
 	public boolean equals(Object o){
 		if( !(o instanceof Edge) ) return false;
-		Edge<T> e= (Edge<T>)o;
+		Edge e= (Edge)o;
 		//nulls serve as wild Node connections
-		return (e.src==src || src==null || e.src==null) && 
-			   (e.dst==dst || dst==null || e.dst==null);
+		return (e.src.equals(src) || src==null || e.src==null) && 
+			   (e.dst.equals(dst) || dst==null || e.dst==null);
 	}
 }
