@@ -2,8 +2,6 @@ package org.javadynamicanalyzer.tests;
 
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
-
 import org.javadynamicanalyzer.graph.Graph;
 
 public class GraphTest {
