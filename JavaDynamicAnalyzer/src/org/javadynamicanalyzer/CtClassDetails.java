@@ -8,7 +8,7 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 
 public class CtClassDetails {
-	static CtClass classCache = new CtClass("NULL") {}; 
+	static CtClass classCache = null; 
 	static Set<CtMethod> methodsDerived = null;
 	static Set<CtMethod> methodsBase = null;
 	
@@ -16,14 +16,20 @@ public class CtClassDetails {
 		classCache=cc;
 		methodsDerived=new HashSet<CtMethod>();
 		methodsBase=new HashSet<CtMethod>();
+		
+		CtClass superClass=null;
+		System.out.println("Test");
 		try {
-			CtClass superClass=cc.getSuperclass();
-			//if(superClass!=null) //not sure if this is needed
-				for(CtMethod m : superClass.getMethods())
-					methodsBase.add(m);
+			System.out.println("Test");
+			superClass=cc.getSuperclass();
+			System.out.println("Test");
 		} 
 		catch (NotFoundException e) { e.printStackTrace(); }
-		
+		finally{ 
+			System.out.println("Test");
+		}
+		for(CtMethod m : superClass.getMethods())
+			methodsBase.add(m);
 		for(CtMethod m : cc.getMethods())
 			if(methodsBase.contains(m)==false)
 				methodsDerived.add(m);
@@ -31,14 +37,22 @@ public class CtClassDetails {
 
 	static public Set<CtMethod> getMethodsDerived(CtClass cc){
 		if(cc==null) return null;
-		if(classCache.equals(cc)==false)
-			initMethods(cc);
+		if(classCache!=null)
+			if(classCache.equals(cc)==true)
+				return methodsDerived;
+
+		initMethods(cc);
+		System.out.println("methodsDerived: "+methodsDerived.size());
+		System.out.println("methodsBase: "+methodsBase.size());
 		return methodsDerived;
 	}
 	static public Set<CtMethod> getMethodsBase(CtClass cc){
 		if(cc==null) return null;
-		if(classCache.equals(cc)==false)
-			initMethods(cc);
+		if(classCache!=null)
+			if(classCache.equals(cc)==true)
+				return methodsBase;
+
+		initMethods(cc);		
 		return methodsBase;
 	}
 }
