@@ -18,18 +18,13 @@ public class CtClassDetails {
 		methodsBase=new HashSet<CtMethod>();
 		
 		CtClass superClass=null;
-		System.out.println("Test");
-		try {
-			System.out.println("Test");
+		try { 
 			superClass=cc.getSuperclass();
-			System.out.println("Test");
+			for(CtMethod m : superClass.getMethods())
+				methodsBase.add(m);
 		} 
 		catch (NotFoundException e) { e.printStackTrace(); }
-		finally{ 
-			System.out.println("Test");
-		}
-		for(CtMethod m : superClass.getMethods())
-			methodsBase.add(m);
+		
 		for(CtMethod m : cc.getMethods())
 			if(methodsBase.contains(m)==false)
 				methodsDerived.add(m);
@@ -42,8 +37,6 @@ public class CtClassDetails {
 				return methodsDerived;
 
 		initMethods(cc);
-		System.out.println("methodsDerived: "+methodsDerived.size());
-		System.out.println("methodsBase: "+methodsBase.size());
 		return methodsDerived;
 	}
 	static public Set<CtMethod> getMethodsBase(CtClass cc){

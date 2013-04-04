@@ -4,27 +4,30 @@ import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
-import java.util.jar.JarFile;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
-
 
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
-	final static String[] ignore = new String[] { "sun/", "java/", "javax/" };
+	final static String[] ignore = new String[]{ 
+		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "bettercontainers/" };
 	
 	//Statically load javaagent at startup
     public static void premain(String args, Instrumentation inst) {
     	JDAAgent jda = new JDAAgent(inst);
-    	JarFile jf=null;
-    	try { jf=new JarFile("JDAtools.jar"); }
-    	catch (IOException e) { e.printStackTrace(); }
-    	inst.appendToBootstrapClassLoaderSearch(jf);
     	inst.addTransformer(jda);
+    	
+    	ClassPool cp=ClassPool.getDefault();
+    	try {
+			cp.get("org.javadynamicanalyzer.JDAtool");
+			cp.get("org.javadynamicanalyzer.timer.Stopwatch");
+		} 
+    	catch (NotFoundException e) { e.printStackTrace(); }
     }
     //Dynamic load javaagent when application is already running
     public static void agentmain(String args, Instrumentation inst) throws Exception {
@@ -34,28 +37,38 @@ public class JDAAgent implements ClassFileTransformer {
    
     //Instrumentation Strings
     //Package names
-    static final String toolImport="";
-    //static final String timerPrefix="";
-    //static final String jdaPrefix="org.javadynamicanalzyer.";
-    static final String toolPrefix="JDAtool";
+    static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
+    								  "org.javadynamicanalyzer.timer.Stopwatch"};
     
     //Variable names
     static final String varPrefix="_JDA_";
-    static final String tslStr=toolPrefix+".tsl";
+    static final String tslStr="JDAtool.tsl";
     
     //Command Lines
     static final String tslStart=tslStr+".start(); ";
     static final String tslStop=tslStr+".stop(); ";
-    static final String stopwatchStart=var("sw")+".start(); ";
-    static final String stopwatchStop=var("sw")+".stop(); ";
-    static final String stopwatchGetTime="long "+var("dt")+"="+var("sw")+".getTime(); ";
-    //stopwatchMake() is a function
+    static String tslMakeStopwatch(String methodName){
+    	return tslStr+".makeStopwatch(\""+methodName+"\"); ";
+    }
+    static String println(String[] str){ 
+    	String out="System.out.println(\"\"";
+    	boolean quotes=true;
+    	for(String s : str){
+    		String builder=s;
+    		if(quotes)
+    			builder="\""+builder+"\"";
+    		builder="+"+builder;
+    		out+=builder;
+    		quotes=!quotes;
+    	}
+    	out+="); ";
+    	return out;
+    }
+    static String println(String str, String literal){ return "System.out.println(\""+str+"\"+"+literal+"); "; }
     
     //Command Functions
-    static String var(String v){ return varPrefix+v; }
-    static String stopwatchMake(String methodName){ 
-    	return "Stopwatch "+var("sw")+"="+tslStr+".makeStopwatch("+methodName+"); "; 
-    }
+    static String var(String v, String post){ return varPrefix+v+post; }
+    static String var(String v){ return var(v,""); }
     
     static Instrumentation inst;
     
@@ -63,23 +76,29 @@ public class JDAAgent implements ClassFileTransformer {
 	@Override
 	public byte[] transform(ClassLoader loader, String className, Class<?> clazz, ProtectionDomain pd, byte[] classfileBuffer) {
 		for (String ign : ignore)
-			if(className.startsWith(ign))
+			if(className.contains(ign))
 				return classfileBuffer;
 		
 		byte[] out=classfileBuffer;
 		ClassPool pool=ClassPool.getDefault(); //sets the library search path to the default
-		pool.importPackage("javadyanmicanalyzer.JDAtool");
+		
+		//Sort out imports for JDA toolsets to work
+		for(String imp : toolImport)
+			pool.importPackage(imp);
+		
+		//Parse the class!
 		CtClass cc=null;
-		try { 
+		try {
+			//Read the byte array
 			cc = pool.makeClass(new java.io.ByteArrayInputStream(classfileBuffer));
 			System.out.println("Analyzing "+cc.getName());
+			
+			//Read the methods
 			CtClassDetails.getMethodsDerived(cc);
 			for(CtMethod m : CtClassDetails.getMethodsDerived(cc)){
-				System.out.println("XFORM BITCH: "+className);
-				System.out.println(m.getName());
+				System.out.println("Instrumenting: " + m.getName());
 				addTimer(m);
 			}
-			System.out.println("Done Analyzing!");
 			out=cc.toBytecode();
 		} 
 		catch (IOException | RuntimeException | CannotCompileException | BadBytecode e) { e.printStackTrace(); }
@@ -92,28 +111,33 @@ public class JDAAgent implements ClassFileTransformer {
 	}
 	
 	void addTimer(CtMethod m) throws CannotCompileException, BadBytecode{
+		String sw=var("sw");
+		try { m.addLocalVariable(sw, ClassPool.getDefault().get("org.javadynamicanalyzer.timer.Stopwatch")); } 
+		catch (NotFoundException e) { e.printStackTrace(); }
+		
 		String methodEntry="{ ";
 		methodEntry+=tslStop;
-		methodEntry+=stopwatchMake(m.getName());
-		methodEntry+=stopwatchStart;
+		methodEntry+=sw+"="+tslMakeStopwatch(m.getName());
+		methodEntry+=sw+".start(); ";
 		methodEntry+=tslStart;
 		methodEntry+="}";
 		
 		String methodExit="{ ";
-		//methodExit+=tslStop;
-		//methodExit+=stopwatchStop;
-		//methodExit+=stopwatchGetTime;
-		//methodExit+=tslStart;
+		methodExit+=tslStop;
+		methodExit+=sw+".stop(); ";
+		methodExit+=println(m.getName()+" took\\t",sw+".getTime()");
+		methodExit+=tslStart;
 		methodExit+="} ";
+		
 		//ControlFlow flow=new ControlFlow(m);
 		//Block[] block=flow.basicBlocks();
 		//block[0].
 		//ClassPool cp=ClassPool.getDefault();
 		//m.insertBefore("System.out.println(\""+m.getName()+"\":);");
-		System.out.println("Instrumenting: "+methodEntry);
+		
+		System.out.println("Before: "+methodEntry);
 		m.insertBefore(methodEntry);
-		System.out.println("Instrumenting: "+methodExit);
+		System.out.println("After: "+methodExit);
 		m.insertAfter(methodExit);
 	}
-	
 }
