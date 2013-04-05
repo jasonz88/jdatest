@@ -15,17 +15,22 @@ import javassist.bytecode.BadBytecode;
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
 	final static String[] ignore = new String[]{ 
-		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "bettercontainers/" };
+		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/"};
+	
+    //Package names
+    static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
+    								  "org.javadynamicanalyzer.timer.Stopwatch"};
 	
 	//Statically load javaagent at startup
     public static void premain(String args, Instrumentation inst) {
     	JDAAgent jda = new JDAAgent(inst);
     	inst.addTransformer(jda);
     	
+    	//Collect my instrumentation tools in the ClassPool
     	ClassPool cp=ClassPool.getDefault();
     	try {
-			cp.get("org.javadynamicanalyzer.JDAtool");
-			cp.get("org.javadynamicanalyzer.timer.Stopwatch");
+    		for(String imp : toolImport)
+    			cp.get(imp);
 		} 
     	catch (NotFoundException e) { e.printStackTrace(); }
     }
@@ -36,10 +41,6 @@ public class JDAAgent implements ClassFileTransformer {
     }
    
     //Instrumentation Strings
-    //Package names
-    static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
-    								  "org.javadynamicanalyzer.timer.Stopwatch"};
-    
     //Variable names
     static final String varPrefix="_JDA_";
     static final String tslStr="JDAtool.tsl";
@@ -117,7 +118,7 @@ public class JDAAgent implements ClassFileTransformer {
 		
 		String methodEntry="{ ";
 		methodEntry+=tslStop;
-		methodEntry+=sw+"="+tslMakeStopwatch(m.getName());
+		methodEntry+=sw+"= new Stopwatch("+tslStr+", \""+m.getName()+"\"); ";
 		methodEntry+=sw+".start(); ";
 		methodEntry+=tslStart;
 		methodEntry+="}";

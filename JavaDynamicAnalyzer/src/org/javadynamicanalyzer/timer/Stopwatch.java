@@ -1,22 +1,18 @@
 package org.javadynamicanalyzer.timer;
 
-import org.bettercontainers.BetterIterator;
-
-
 public class Stopwatch {
 	final TimestampList tsl;
 	final String name;
-	BetterIterator<Timestamp> start=null;
-	Timestamp stop=null;
+	BetterLinkedList<Timestamp>.iterator start=null;
+	BetterLinkedList<Timestamp>.iterator stop=null;
 	
-	//only TimestampList is allowed to call this
-	Stopwatch(TimestampList tsl, String name){
+	public Stopwatch(TimestampList tsl, String name){
 		this.tsl=tsl;
 		this.name=name;
 	} 
 	
-	public void start(){ start=tsl.current.clone(); }
-	public void stop(){ stop=tsl.current.deref(); }
+	public void start(){ start=tsl.end(); start.prev(); } //start iterator is off the end of the list, then recursed back to the last element
+	public void stop(){ stop=tsl.end(); }
 	
 	public long getTime(){ 
 		long out=0;
@@ -24,12 +20,12 @@ public class Stopwatch {
 		if(stop==null) return out;
 		if(start.hasNext()==false) return out;
 		
-		BetterIterator<Timestamp> itr=start.clone();
+		BetterLinkedList<Timestamp>.iterator itr=start.clone();
 		
 		Timestamp ts=itr.next();
 		long startTime=ts.time;
 		boolean counting=ts.flag;
-		while(ts.equals(stop)==false){
+		while(itr.equals(stop)==false){
 			if(counting==true)
 				out=out+(ts.time-startTime);
 			startTime=ts.time;

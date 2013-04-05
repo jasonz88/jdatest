@@ -1,6 +1,7 @@
 package org.javadynamicanalyzer.tests;
 import org.javadynamicanalyzer.JDAtool;
 import org.javadynamicanalyzer.timer.Stopwatch;
+import org.javadynamicanalyzer.timer.Timestamp;
 
 public class JDAtoolTest {
 	public static void main(String[] arg) throws InterruptedException{
@@ -53,5 +54,8 @@ public class JDAtoolTest {
 		long err=Math.abs(sw.getTime()-dt);
 		System.out.println("Difference:\t" + err);
 		System.out.println("Percent Error:\t" + (double)(100*err/dt) + "%");
+		System.out.println("\nList Contents:");
+		for(Timestamp ts : JDAtool.tsl)
+			System.out.println(ts);
 	}
 }

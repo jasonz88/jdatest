@@ -1,37 +1,47 @@
-package org.bettercontainers.betterlinkedlist;
+package org.javadynamicanalyzer.timer;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.bettercontainers.BetterIterable;
-import org.bettercontainers.BetterIterator;
 
 
-public class BetterLinkedList<T> implements BetterIterable<T>, Collection<T>{
-	int size=0;
-	Node<T> head=new Node<T>();
-	Node<T> last=head;
-	
-	public void dump(){
-		Node<T> itr=head;
-		while(itr.next!=null){
-			System.out.println(itr.e);
-			itr=itr.next;
+public class BetterLinkedList<T> implements Collection<T>{
+	class Node {
+		T e=null;
+		Node next=null;
+		Node prev=null;
+		
+		Node(){}
+		Node(T e, Node next, Node prev){
+			this.e=e;
+			this.next=next;
+			this.prev=prev;
 		}
 	}
 	
+	int size=0;
+	Node head; //will be an invalid node at the head of the list
+	Node last; //will be an invalid node at the end of the list to make sure end iterators don't fall off
+	
+	public BetterLinkedList(){
+		head=new Node();
+		last=new Node();
+		
+		head.next=last;
+		last.prev=head;
+	}
+	
 	public boolean add(T e){
-		last.next=new Node<T>();
-		last.next.prev=last;
-		last=last.next;
-		last.e=e;
-		last.next=null;
+		last.e=e; //set this node's element to the new item
+		last.next=new Node(); //make a new node
+		last.next.prev=last; //link the new node to the old node
+		last=last.next; //go to the new node
 		++size;
 		return true;
 	}
 	public void addLast(T e){ add(e); }
 	public void addFirst(T e){
-		Node<T> n=new Node<T>();
+		Node n=new Node();
 		n.e=e;
 		head.prev=n;
 		n.next=head;
@@ -47,13 +57,13 @@ public class BetterLinkedList<T> implements BetterIterable<T>, Collection<T>{
 		return last.e;
 	}
 	
-	class iterator implements BetterIterator<T>{
-		Node<T> current;
+	class iterator implements Iterator<T>{
+		Node current;
 		
-		iterator(Node<T> n){ current=n; }
+		iterator(Node n){ current=n; }
 		
 		//standard
-		public boolean hasNext(){ return isValid() && current.next!=null; }
+		public boolean hasNext(){ return current.next!=last; }
 		public T next(){ 
 			current=current.next;
 			return current.e;
@@ -78,7 +88,7 @@ public class BetterLinkedList<T> implements BetterIterable<T>, Collection<T>{
 		}
 		public T deref(){ return current.e; }
 		public void insert(T e){
-			Node<T> newNode=new Node<T>();
+			Node newNode=new Node();
 			newNode.e=e;
 			newNode.prev=current;
 			newNode.next=current.next;
@@ -100,10 +110,11 @@ public class BetterLinkedList<T> implements BetterIterable<T>, Collection<T>{
 		
 		public iterator clone(){ return new iterator(current); }
 		public boolean isValid(){ return current.e!=null; }
+		public boolean equals(iterator itr){ return this.current==itr.current; }
 	}
+	public iterator begin() { return new iterator(head); }
+	public iterator end() { return new iterator(last); }
 	
-	@Override
-	public BetterIterator<T> betterIterator() { return new iterator(head); }
 	@Override
 	public Iterator<T> iterator(){ return new iterator(head); }
 	
@@ -178,7 +189,7 @@ public class BetterLinkedList<T> implements BetterIterable<T>, Collection<T>{
 	}
 	@Override
 	public void clear() {
-		head=new Node<T>();
+		head=new Node();
 		last=head;
 		size=0;	
 	}
