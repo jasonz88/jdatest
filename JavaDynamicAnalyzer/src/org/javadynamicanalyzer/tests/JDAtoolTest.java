@@ -22,7 +22,7 @@ public class JDAtoolTest {
 		JDAtool.tsl.start();
 		long time=System.nanoTime();
 		
-		//execBlock(); //main execute block
+		execBlock(); //main execute block
 
 		//Function 1 starts
 		JDAtool.tsl.stop();
@@ -33,6 +33,13 @@ public class JDAtoolTest {
 		time=System.nanoTime();
 		
 		execBlock(); //f1 execute block
+		//This is like f1 is calling a lot of small functions
+		JDAtool.tsl.stop();
+		JDAtool.tsl.start();
+		JDAtool.tsl.stop();
+		JDAtool.tsl.start();
+		JDAtool.tsl.stop();
+		JDAtool.tsl.start();
 		
 		//Function 1 stops
 		JDAtool.tsl.stop();
@@ -41,7 +48,7 @@ public class JDAtoolTest {
 		JDAtool.tsl.start();
 		time=System.nanoTime();
 		
-		//execBlock(); //main execute block
+		execBlock(); //main execute block
 		
 		//Function 2 starts
 		JDAtool.tsl.stop();
@@ -60,7 +67,7 @@ public class JDAtoolTest {
 		JDAtool.tsl.start();
 		time=System.nanoTime();
 		
-		//execBlock(); //main execute block
+		execBlock(); //main execute block
 		
 		//Conclude
 		JDAtool.tsl.stop();
