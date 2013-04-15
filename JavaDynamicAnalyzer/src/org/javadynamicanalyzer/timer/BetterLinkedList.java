@@ -49,12 +49,10 @@ public class BetterLinkedList<T> implements Collection<T>{
 		++size;
 	}
 	public T getFirst(){
-		if(head.next==null) return null;
 		return head.next.e;
 	}
 	public T getLast(){
-		if(last==head) return null;
-		return last.e;
+		return last.prev.e;
 	}
 	
 	class iterator implements Iterator<T>{
@@ -69,15 +67,11 @@ public class BetterLinkedList<T> implements Collection<T>{
 			return current.e;
 		}
 		public void remove(){
-			if(current==head) return;
+			if(current==head || current==last) return;
 			current.e=null;
 			current.prev.next=current.next;
-			if(current.next!=null){
-				current.next.prev=current.prev;
-				current=current.next;
-			}
-			else
-				current=current.prev;
+			current.next.prev=current.prev;
+			current=current.next;
 			--size;
 		}
 		//better stuff
@@ -99,24 +93,22 @@ public class BetterLinkedList<T> implements Collection<T>{
 		}
 		public void insertNext(T e){ insert(e); }
 		public void insertPrev(T e){
-			if(current==head){
-				addFirst(e);
-				current=head;
-				return;
-			}
+			assert(current!=head);
 			iterator itr=new iterator(current.prev);
 			itr.insertNext(e);
 		}
 		
 		public iterator clone(){ return new iterator(current); }
 		public boolean isValid(){ return current.e!=null; }
-		public boolean equals(iterator itr){ return this.current==itr.current; }
+		public boolean equals(Object o){ return false; }
+		public boolean equals(BetterLinkedList<T>.iterator itr){ return this.current==itr.current; }
 	}
-	public iterator begin() { return new iterator(head); }
-	public iterator end() { return new iterator(last); }
 	
 	@Override
 	public Iterator<T> iterator(){ return new iterator(head); }
+	public iterator begin() { return new iterator(head); }
+	public iterator end() { return new iterator(last); }
+	public iterator last(){ return new iterator(last.prev); }
 	
 	//Container Stuff
 	@Override

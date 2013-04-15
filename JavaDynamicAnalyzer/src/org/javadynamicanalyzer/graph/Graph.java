@@ -20,7 +20,7 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 
 @SuppressWarnings("serial")
 public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements Iterable<T> {
-	//Make a classes to draw to JFrames
+	//Make classes to draw to JFrames
 	//class Layout extends FRLayout2<T, Edge<T>>{
 	class Layout extends KKLayout<T, Edge<T>>{
 		public Layout(Graph<T> g){ super(g); } 
@@ -58,6 +58,7 @@ public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements It
 	}
 	
 	public void setName(String name){ this.name=name; }
+	
 	public void getVisual(String name){
         JFrame frame = new JFrame(name);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -66,6 +67,7 @@ public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements It
         frame.setVisible(true); 
 	}
 	public void getVisual(){ getVisual(toString()); }
+	
 	
 	public Collection<T> getNodes(){ return super.getVertices(); }
 	

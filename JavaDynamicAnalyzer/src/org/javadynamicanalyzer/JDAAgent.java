@@ -11,11 +11,15 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
+import javassist.bytecode.analysis.ControlFlow;
+import javassist.bytecode.analysis.ControlFlow.Block;
+
+import org.javadynamicanalyzer.graph.Graph;
 
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
 	final static String[] ignore = new String[]{ 
-		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/"};
+		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "jung/", "apache/"};
 	
     //Package names
     static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
@@ -112,13 +116,15 @@ public class JDAAgent implements ClassFileTransformer {
 	}
 	
 	void addTimer(CtMethod m) throws CannotCompileException, BadBytecode{
+		String methodName=m.getLongName();
+		
 		String sw=var("sw");
 		try { m.addLocalVariable(sw, ClassPool.getDefault().get("org.javadynamicanalyzer.timer.Stopwatch")); } 
 		catch (NotFoundException e) { e.printStackTrace(); }
 		
 		String methodEntry="{ ";
 		methodEntry+=tslStop;
-		methodEntry+=sw+"= new Stopwatch("+tslStr+", \""+m.getName()+"\"); ";
+		methodEntry+=sw+"= new Stopwatch("+tslStr+"); ";
 		methodEntry+=sw+".start(); ";
 		methodEntry+=tslStart;
 		methodEntry+="}";
@@ -126,18 +132,30 @@ public class JDAAgent implements ClassFileTransformer {
 		String methodExit="{ ";
 		methodExit+=tslStop;
 		methodExit+=sw+".stop(); ";
-		methodExit+=println(m.getName()+" took\\t",sw+".getTime()");
-		methodExit+=tslStart;
+		methodExit+=println(methodName+" took\\t",sw+".getTime()");
+		if(methodName.contains("main")) 
+			methodExit+="JDAtool.getGraph(\""+methodName+"\").getVisual(); ";
+		else
+			methodExit+=tslStart;
+
 		methodExit+="} ";
 		
-		//ControlFlow flow=new ControlFlow(m);
-		//Block[] block=flow.basicBlocks();
-		//block[0].
+		Graph<Block> methodGraph=JDAtool.getGraph(m.getLongName());		
+		methodGraph.setName(methodName);
+		
+		ControlFlow flow=new ControlFlow(m);
+		Block[] blockArray=flow.basicBlocks();
+		for(Block b : blockArray){
+			for(int i=0; i<b.incomings(); ++i)
+				methodGraph.addEdge(b.incoming(i), b);
+		}			
+		
 		//ClassPool cp=ClassPool.getDefault();
 		//m.insertBefore("System.out.println(\""+m.getName()+"\":);");
 		
 		System.out.println("Before: "+methodEntry);
 		m.insertBefore(methodEntry);
+		
 		System.out.println("After: "+methodExit);
 		m.insertAfter(methodExit);
 	}

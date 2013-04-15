@@ -1,40 +1,45 @@
 package org.javadynamicanalyzer.timer;
 
+
 public class Stopwatch {
 	final TimestampList tsl;
-	final String name;
 	BetterLinkedList<Timestamp>.iterator start=null;
 	BetterLinkedList<Timestamp>.iterator stop=null;
 	
-	public Stopwatch(TimestampList tsl, String name){
-		this.tsl=tsl;
-		this.name=name;
-	} 
+	long cachedTime=0;
+	boolean cacheValid=false;
 	
-	public void start(){ start=tsl.end(); start.prev(); } //start iterator is off the end of the list, then recursed back to the last element
-	public void stop(){ stop=tsl.end(); }
+	public Stopwatch(TimestampList tsl){ this.tsl=tsl; }
+	
+	public void start(){ start=tsl.end(); cacheValid=false; }
+	public void stop(){ stop=tsl.end(); cacheValid=false; }
+	public void delete(){ remove(); }
+	public void remove(){
+		if(start==null || stop==null) return;
+		if(start.equals(stop)) return;
+		
+		long getTime=getTime();
+		//start.next(); //we do not want to remove the first element
+		while(start.equals(stop)==false)
+			start.remove();
+		
+		start.insertPrev(new Timestamp(getTime));
+	}
 	
 	public long getTime(){ 
-		long out=0;
+		if(cacheValid==true) return cachedTime;
+		cachedTime=0;
 		
-		if(stop==null) return out;
-		if(start.hasNext()==false) return out;
+		if(stop==null || stop==null) return cachedTime;
 		
 		BetterLinkedList<Timestamp>.iterator itr=start.clone();
-		
-		Timestamp ts=itr.next();
-		long startTime=ts.time;
-		boolean counting=ts.flag;
+		Timestamp ts=itr.deref(); //we want *this* element, not the next one!
 		while(itr.equals(stop)==false){
-			if(counting==true)
-				out=out+(ts.time-startTime);
-			startTime=ts.time;
-			counting=ts.flag;
+			cachedTime+=ts.time;
 			ts=itr.next();
 		}
-		if(counting==true)
-			out=out+(ts.time-startTime);
 		
-		return out;
+		cacheValid=true;
+		return cachedTime;
 	}
 }

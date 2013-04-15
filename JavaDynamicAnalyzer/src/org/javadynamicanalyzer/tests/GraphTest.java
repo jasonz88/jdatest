@@ -26,6 +26,6 @@ public class GraphTest {
 
     public static void main(String[] args) {
     	constructGraph();
-    	g.getVisual("Test Graph");
+    	//g.getVisual("Test Graph");
     }   
 }
