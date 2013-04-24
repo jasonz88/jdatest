@@ -3,23 +3,34 @@ package org.javadynamicanalyzer;
 import java.util.HashMap;
 import java.util.Map;
 
-import javassist.bytecode.analysis.ControlFlow.Block;
-
-import org.javadynamicanalyzer.graph.Graph;
+import org.javadynamicanalyzer.graph.MethodNode;
+import org.javadynamicanalyzer.timer.BetterLinkedList;
 import org.javadynamicanalyzer.timer.TimestampList;
 
 public class JDAtool {
 	public static TimestampList tsl=new TimestampList();
-	static Map<String,Graph<Block>> cfgMap=new HashMap<String,Graph<Block>>();
+	public static String currentMethodName=null;
 	
-	public static Graph<Block> getGraph(String methodName){
+	public static BetterLinkedList<MethodStackEntry> msl=new BetterLinkedList<MethodStackEntry>();
+	
+	public static Map<String,MethodNode> cfgMap=new HashMap<String,MethodNode>();
+	
+	public static MethodNode getMethodNode(String methodName){
 		if(cfgMap.containsKey(methodName)==false){	
-			Graph<Block> out=new Graph<Block>();			
+			MethodNode out=new MethodNode(methodName);			
 			cfgMap.put(methodName, out);
 			return out;
 		}
 		else{			
 			return cfgMap.get(methodName);
+		}
+	}
+	public static MethodStackEntry getLastMSE(){ return msl.getLast(); }
+	public static void methodStackPop(){ msl.pop(); }
+	public static void gui(){
+		for(String key : cfgMap.keySet()){
+			MethodNode mn=cfgMap.get(key);
+			mn.getVisual();
 		}
 	}
 }

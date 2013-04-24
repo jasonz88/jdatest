@@ -1,9 +1,8 @@
 package org.javadynamicanalyzer.tests;
 import org.javadynamicanalyzer.JDAtool;
 import org.javadynamicanalyzer.timer.Stopwatch;
-import org.javadynamicanalyzer.timer.Timestamp;
 
-public class JDAtoolTest {
+public class JDAtoolTestTime {
 	public static void execBlock(){
 		for(long i=0; i<100000; i++){
 			i+=i*i/Math.sqrt(i*i);

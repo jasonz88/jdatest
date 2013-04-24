@@ -58,6 +58,7 @@ public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements It
 	}
 	
 	public void setName(String name){ this.name=name; }
+	public String getName() { return name; }
 	
 	public void getVisual(String name){
         JFrame frame = new JFrame(name);

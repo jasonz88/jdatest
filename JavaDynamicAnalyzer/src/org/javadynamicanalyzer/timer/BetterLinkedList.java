@@ -48,6 +48,17 @@ public class BetterLinkedList<T> implements Collection<T>{
 		head=n;
 		++size;
 	}
+	public void pop(){
+		last=last.prev;
+		last.next=null;
+		last.e=null;
+	}
+	public void popLast(){ pop(); }
+	public void popFirst(){
+		head=head.next;
+		head.prev=null;
+		head.e=null;
+	}
 	public T getFirst(){
 		return head.next.e;
 	}

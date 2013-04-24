@@ -14,7 +14,7 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.analysis.ControlFlow;
 import javassist.bytecode.analysis.ControlFlow.Block;
 
-import org.javadynamicanalyzer.graph.Graph;
+import org.javadynamicanalyzer.graph.MethodNode;
 
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
@@ -23,10 +23,20 @@ public class JDAAgent implements ClassFileTransformer {
 	
     //Package names
     static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
+    								  "org.javadynamicanalyzer.MethodStackEntry",
+    								  "org.javadynamicanalyzer.graph.BasicBlockPath",
     								  "org.javadynamicanalyzer.timer.Stopwatch"};
+    
+    //Options
+    static boolean trackTime=false;
+    static boolean trackBlocks=true;
+    static boolean trackPaths=false;
+    static boolean verbose=false;
 	
 	//Statically load javaagent at startup
     public static void premain(String args, Instrumentation inst) {
+    	if(trackPaths) trackBlocks=true;
+    	
     	JDAAgent jda = new JDAAgent(inst);
     	inst.addTransformer(jda);
     	
@@ -102,7 +112,7 @@ public class JDAAgent implements ClassFileTransformer {
 			CtClassDetails.getMethodsDerived(cc);
 			for(CtMethod m : CtClassDetails.getMethodsDerived(cc)){
 				System.out.println("Instrumenting: " + m.getName());
-				addTimer(m);
+				instrumentMethod(m);
 			}
 			out=cc.toBytecode();
 		} 
@@ -115,48 +125,117 @@ public class JDAAgent implements ClassFileTransformer {
         return out;
 	}
 	
-	void addTimer(CtMethod m) throws CannotCompileException, BadBytecode{
-		String methodName=m.getLongName();
+	void instrumentMethod(CtMethod m) throws CannotCompileException, BadBytecode{
+		String methodName=m.getLongName();	
+		boolean isMain=methodName.contains("main");
 		
-		String sw=var("sw");
-		try { m.addLocalVariable(sw, ClassPool.getDefault().get("org.javadynamicanalyzer.timer.Stopwatch")); } 
-		catch (NotFoundException e) { e.printStackTrace(); }
+		String sw=null;
+		if(trackTime){
+			sw=var("sw");
+			try { m.addLocalVariable(sw, ClassPool.getDefault().get("org.javadynamicanalyzer.timer.Stopwatch")); } 
+			catch (NotFoundException e) { e.printStackTrace(); }
+		}
 		
-		String methodEntry="{ ";
-		methodEntry+=tslStop;
-		methodEntry+=sw+"= new Stopwatch("+tslStr+"); ";
-		methodEntry+=sw+".start(); ";
-		methodEntry+=tslStart;
-		methodEntry+="}";
+		String mse=null;
+		String lmse=null;
+		if(trackBlocks){
+			mse=var("mse");
+			try { m.addLocalVariable(mse, ClassPool.getDefault().get("org.javadynamicanalyzer.MethodStackEntry")); } 
+			catch (NotFoundException e) { e.printStackTrace(); }
+			lmse=var("lmse");
+			try { m.addLocalVariable(lmse, ClassPool.getDefault().get("org.javadynamicanalyzer.MethodStackEntry")); } 
+			catch (NotFoundException e) { e.printStackTrace(); }
+		}
 		
-		String methodExit="{ ";
-		methodExit+=tslStop;
-		methodExit+=sw+".stop(); ";
-		methodExit+=println(methodName+" took\\t",sw+".getTime()");
-		if(methodName.contains("main")) 
-			methodExit+="JDAtool.getGraph(\""+methodName+"\").getVisual(); ";
-		else
-			methodExit+=tslStart;
-
-		methodExit+="} ";
+		String path=null;
+		if(trackPaths){
+			path=var("path");
+			try { m.addLocalVariable(path, ClassPool.getDefault().get("org.javadynamicanalyzer.graph.BasicBlockPath")); } 
+			catch (NotFoundException e) { e.printStackTrace(); }			
+		}
 		
-		Graph<Block> methodGraph=JDAtool.getGraph(m.getLongName());		
-		methodGraph.setName(methodName);
-		
-		ControlFlow flow=new ControlFlow(m);
-		Block[] blockArray=flow.basicBlocks();
-		for(Block b : blockArray){
-			for(int i=0; i<b.incomings(); ++i)
-				methodGraph.addEdge(b.incoming(i), b);
-		}			
-		
-		//ClassPool cp=ClassPool.getDefault();
-		//m.insertBefore("System.out.println(\""+m.getName()+"\":);");
-		
+		//INSERTED AT THE BEGINNING OF THE METHOD
+		String methodEntry=new String();
+		if(trackTime){
+			methodEntry+=tslStop;
+			methodEntry+=sw+"= new Stopwatch("+tslStr+"); ";
+			methodEntry+=sw+".start(); ";
+		}
+		if(trackBlocks){
+			if(isMain)
+				methodEntry+=mse+"=new MethodStackEntry(\""+methodName+"\"); ";
+			else{
+				methodEntry+=lmse+"=JDAtool.getLastMSE(); ";
+				methodEntry+=mse+"=new MethodStackEntry(\""+methodName+"\"); ";
+				methodEntry+=lmse+".mn.addLink("+lmse+".blockIndex, "+mse+".mn); ";
+			}
+		}
+		if(trackPaths){
+			methodEntry+=path+"=new BasicBlockPath(); ";
+		}
+		if(trackTime){
+			methodEntry+=tslStart;
+		}
+		methodEntry="{ " + methodEntry + " }";
 		System.out.println("Before: "+methodEntry);
 		m.insertBefore(methodEntry);
 		
+		//INSERTED AT BASIC BLOCKS
+		MethodNode mn=JDAtool.getMethodNode(methodName);		
+		ControlFlow flow=new ControlFlow(m);
+		Block[] blockArray=flow.basicBlocks();
+		for(Block thisbb : blockArray){
+		//for(int q=blockArray.length-1; q>=0; --q){
+			//Block thisbb=blockArray[q];
+			//Statically Update Method Graph
+			mn.addNode(thisbb);
+			int inSize=thisbb.incomings();
+			for(int i=0; i<inSize; ++i){
+				Block inbb=thisbb.incoming(i);
+				mn.addEdge(inbb,thisbb);
+			}
+			
+			//Dynamically Update Method Statistics
+			String blockUpdate=new String();
+			String thisbbIndex=Integer.toString(thisbb.index());
+			if(trackBlocks){
+				//blockUpdate+=mse+".blockIndex="+thisbbIndex+"; ";
+				blockUpdate+=mse+".setBlockIndex("+thisbbIndex+"); ";
+			}
+			if(trackPaths){
+				blockUpdate+=path+".addBlock("+thisbbIndex+"); ";
+			}
+			blockUpdate="{ " + blockUpdate + "} ";
+			
+			//Insert
+			System.out.print("At "+thisbb.position()+": "+blockUpdate);
+			int n=m.insertAt(thisbb.position(),blockUpdate);
+			System.out.println(" -> "+n);
+		}			
+
+		//INSERTED AT THE END OF THE METHOD
+		String methodExit=new String();
+		if(trackTime){
+			methodExit+=tslStop;
+			methodExit+=sw+".stop(); ";
+			methodExit+=println(methodName+" took\\t",sw+".getTime()");
+		}
+		if(trackPaths){
+			methodExit+=mse+".mn.addPath("+path+"); ";
+		}
+		if(trackBlocks){
+			methodExit+="JDAtool.methodStackPop(); ";
+		}
+		if(trackTime){
+			methodExit+=tslStart;
+		}
+		if(isMain) 
+			methodExit+="JDAtool.gui(); ";
+		methodExit="{ " + methodExit + " }";
 		System.out.println("After: "+methodExit);
 		m.insertAfter(methodExit);
+		
+		//ClassPool cp=ClassPool.getDefault();
+		//m.insertBefore("System.out.println(\""+m.getName()+"\":);");
 	}
 }
