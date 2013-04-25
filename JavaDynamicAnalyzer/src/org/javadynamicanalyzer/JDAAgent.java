@@ -14,7 +14,6 @@ import javassist.bytecode.BadBytecode;
 import javassist.bytecode.analysis.ControlFlow;
 import javassist.bytecode.analysis.ControlFlow.Block;
 
-import org.javadynamicanalyzer.graph.MethodNode;
 
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
@@ -176,23 +175,22 @@ public class JDAAgent implements ClassFileTransformer {
 		if(trackTime){
 			methodEntry+=tslStart;
 		}
-		methodEntry="{ " + methodEntry + " }";
+		methodEntry="{ " + methodEntry + "}";
 		System.out.println("Before: "+methodEntry);
 		m.insertBefore(methodEntry);
 		
 		//INSERTED AT BASIC BLOCKS
-		MethodNode mn=JDAtool.getMethodNode(methodName);		
+		MethodNode mNode=JDAtool.getMethodNode(methodName); //Get my method data structure for this method
+		
 		ControlFlow flow=new ControlFlow(m);
-		Block[] blockArray=flow.basicBlocks();
+		Block[] blockArray=flow.basicBlocks();	 
 		for(Block thisbb : blockArray){
-		//for(int q=blockArray.length-1; q>=0; --q){
-			//Block thisbb=blockArray[q];
 			//Statically Update Method Graph
-			mn.addNode(thisbb);
+			mNode.addNode(thisbb);
 			int inSize=thisbb.incomings();
 			for(int i=0; i<inSize; ++i){
 				Block inbb=thisbb.incoming(i);
-				mn.addEdge(inbb,thisbb);
+				mNode.addEdge(inbb,thisbb);
 			}
 			
 			//Dynamically Update Method Statistics
@@ -205,11 +203,12 @@ public class JDAAgent implements ClassFileTransformer {
 			if(trackPaths){
 				blockUpdate+=path+".addBlock("+thisbbIndex+"); ";
 			}
-			blockUpdate="{ " + blockUpdate + "} ";
+			blockUpdate="{ " + blockUpdate + "}";
 			
 			//Insert
-			System.out.print("At "+thisbb.position()+": "+blockUpdate);
-			int n=m.insertAt(thisbb.position(),blockUpdate);
+			int pos=m.getMethodInfo().getLineNumber(thisbb.position()); //Source code line position from binary line position
+			System.out.print("At "+pos+": "+blockUpdate);
+			int n=m.insertAt(pos, blockUpdate);
 			System.out.println(" -> "+n);
 		}			
 
@@ -231,11 +230,8 @@ public class JDAAgent implements ClassFileTransformer {
 		}
 		if(isMain) 
 			methodExit+="JDAtool.gui(); ";
-		methodExit="{ " + methodExit + " }";
+		methodExit="{ " + methodExit + "}";
 		System.out.println("After: "+methodExit);
 		m.insertAfter(methodExit);
-		
-		//ClassPool cp=ClassPool.getDefault();
-		//m.insertBefore("System.out.println(\""+m.getName()+"\":);");
 	}
 }

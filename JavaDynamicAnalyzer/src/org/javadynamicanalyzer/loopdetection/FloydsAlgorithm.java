@@ -1,4 +1,4 @@
-package org.javadynamicanalyzer.graph.loopdetection;
+package org.javadynamicanalyzer.loopdetection;
 
 import java.util.List;
 

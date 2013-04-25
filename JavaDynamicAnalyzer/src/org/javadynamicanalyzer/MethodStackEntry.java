@@ -1,6 +1,5 @@
 package org.javadynamicanalyzer;
 
-import org.javadynamicanalyzer.graph.MethodNode;
 
 //MethodStackEntry can't be an inner class of JDAtool because it will fuck up Javassist.
 public class MethodStackEntry {

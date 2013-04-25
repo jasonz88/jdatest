@@ -3,7 +3,6 @@ package org.javadynamicanalyzer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.javadynamicanalyzer.graph.MethodNode;
 import org.javadynamicanalyzer.timer.BetterLinkedList;
 import org.javadynamicanalyzer.timer.TimestampList;
 

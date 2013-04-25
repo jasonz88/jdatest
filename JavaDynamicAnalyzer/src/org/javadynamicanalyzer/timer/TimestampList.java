@@ -1,9 +1,5 @@
 package org.javadynamicanalyzer.timer;
 
-import org.javadynamicanalyzer.JDAtool;
-
-
-
 public class TimestampList extends BetterLinkedList<Timestamp> {
 	long start;
 

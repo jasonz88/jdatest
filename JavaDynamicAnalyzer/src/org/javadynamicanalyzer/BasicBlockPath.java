@@ -1,4 +1,4 @@
-package org.javadynamicanalyzer.graph;
+package org.javadynamicanalyzer;
 
 import java.util.LinkedList;
 

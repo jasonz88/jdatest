@@ -1,4 +1,4 @@
-package org.javadynamicanalyzer.graph.loopdetection;
+package org.javadynamicanalyzer.loopdetection;
 
 public class Result {
     private final int lambda;

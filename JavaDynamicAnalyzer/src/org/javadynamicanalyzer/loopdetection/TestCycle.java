@@ -1,4 +1,4 @@
-package org.javadynamicanalyzer.graph.loopdetection;
+package org.javadynamicanalyzer.loopdetection;
 
 import static org.junit.Assert.*;
 
