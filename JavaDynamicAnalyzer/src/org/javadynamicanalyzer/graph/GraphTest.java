@@ -1,8 +1,7 @@
-package org.javadynamicanalyzer.tests;
+package org.javadynamicanalyzer.graph;
 
 import java.util.ArrayList;
 
-import org.javadynamicanalyzer.graph.Graph;
 
 public class GraphTest {
     // since inner classes cannot have static members

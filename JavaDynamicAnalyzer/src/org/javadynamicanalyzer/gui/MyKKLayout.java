@@ -1,4 +1,4 @@
-package GUI;
+package org.javadynamicanalyzer.gui;
 
 /*
  * Copyright (c) 2003, the JUNG Project and the Regents of the University 

@@ -6,7 +6,6 @@ import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -24,13 +23,12 @@ import javassist.bytecode.analysis.ControlFlow.Block;
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
 	final static String[] ignore = new String[]{ 
-		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "jung/", "apache/","GUI/"};
+		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "jung/", "apache/"};
 	
     //Package names
     static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
     								  "org.javadynamicanalyzer.MethodStackEntry",
     								  "org.javadynamicanalyzer.BasicBlockPath",
-    								  "GUI.BalloonLayoutDemo",
     								  "org.javadynamicanalyzer.timer.Stopwatch"};
 	
 	//Statically load javaagent at startup
@@ -55,33 +53,10 @@ public class JDAAgent implements ClassFileTransformer {
    
     //Instrumentation Strings
     //Variable names
-    static final String varPrefix="_JDA_";
-    static final String tslStr="JDAtool.tsl";
-    
-    //Command Lines
-    static final String tslStart=tslStr+".start(); ";
-    static final String tslStop=tslStr+".stop(); ";
-    static String tslMakeStopwatch(String methodName){
-    	return tslStr+".makeStopwatch(\""+methodName+"\"); ";
-    }
-    static String println(String[] str){ 
-    	String out="System.out.println(\"\"";
-    	boolean quotes=true;
-    	for(String s : str){
-    		String builder=s;
-    		if(quotes)
-    			builder="\""+builder+"\"";
-    		builder="+"+builder;
-    		out+=builder;
-    		quotes=!quotes;
-    	}
-    	out+="); ";
-    	return out;
-    }
-    static String println(String str, String literal){ return "System.out.println(\""+str+"\"+"+literal+"); "; }
+    static final String tsl="JDAtool.tsl";
     
     //Command Functions
-    static String var(String v, String post){ return varPrefix+v+post; }
+    static String var(String v, String post){ return "_JDA_"+v; }
     static String var(String v){ return var(v,""); }
     
     static Instrumentation inst;
@@ -92,6 +67,8 @@ public class JDAAgent implements ClassFileTransformer {
 		for (String ign : ignore)
 			if(className.contains(ign))
 				return classfileBuffer;
+		
+		System.out.println(className);
 		
 		byte[] out=classfileBuffer;
 		ClassPool pool=ClassPool.getDefault(); //sets the library search path to the default
@@ -159,8 +136,8 @@ public class JDAAgent implements ClassFileTransformer {
 		//INSERTED AT THE BEGINNING OF THE METHOD
 		String methodEntry=new String();
 		if(JDAtool.trackTime){
-			methodEntry+=tslStop;
-			methodEntry+=sw+"= new Stopwatch("+tslStr+"); ";
+			methodEntry+=tsl+".stop(); ";
+			methodEntry+=sw+"= new Stopwatch("+tsl+"); ";
 			methodEntry+=sw+".start(); ";
 		}
 		if(JDAtool.trackBlocks && !isMain){
@@ -175,7 +152,7 @@ public class JDAAgent implements ClassFileTransformer {
 			methodEntry+=mse+".setBlockIndex(0); ";
 		}
 		if(JDAtool.trackTime){
-			methodEntry+=tslStart;
+			methodEntry+=tsl+".start(); ";
 		}
 		methodEntry="{ " + methodEntry + "}";
 		if(JDAtool.verbose)
@@ -235,19 +212,21 @@ public class JDAAgent implements ClassFileTransformer {
 		//INSERTED AT THE END OF THE METHOD
 		String methodExit=new String();
 		if(JDAtool.trackTime){
-			methodExit+=tslStop;
+			methodExit+=tsl+".stop(); ";
 			methodExit+=sw+".stop(); ";
 		}
 		if(JDAtool.trackPaths){
-			methodExit+=mse+".concludePath(); ";
+			if(JDAtool.trackTime)
+				methodExit+=mse+".concludePath("+sw+".getTime()); ";
+			else
+				methodExit+=mse+".concludePath(); ";
 		}
 		
 		methodExit+="JDAtool.methodStackPop(); ";
 
 		if(JDAtool.trackTime){
-			methodExit+=mse+".mn.addTime("+sw+".getTime()); ";
 			methodExit+=sw+".remove(); ";
-			methodExit+=tslStart;
+			methodExit+=tsl+".start(); ";
 		}
 		if(isMain) 
 			methodExit+="JDAtool.gui(); ";
@@ -265,34 +244,6 @@ public class JDAAgent implements ClassFileTransformer {
 			return new byte[]{(byte) (Bytecode.ALOAD_0+mseStackIndex),3,(byte) 0xb6};
 		else 
 			return new byte[]{Bytecode.ALOAD,(byte) mseStackIndex,3,(byte) 0xb6};
-	}
-	List<Byte> diff(byte[] init, byte[] end){
-		assert(init!=null && end!=null);
-		List<Byte> out = new ArrayList<Byte>();
-		
-		int index=0;
-		while(init[index]==end[index]) ++index;
-		
-		int i=index;
-		while(init[index]!=end[i])
-			out.add(end[i++]);
-		
-		return out;
-	}
-	int findMatch(List<Byte> inst, byte[] tag){
-		assert(tag.length>=3);
-		for(int i=0; i<inst.size(); ++i){ //for every offset in inst
-			boolean match = true;
-			for(int c=0; c<tag.length; ++c){ //match the tag array
-				if(inst.get(i+c).equals(tag[c])==false){
-					match=false;
-					break;
-				}
-			}
-			if(match==true) return i;
-		}
-		assert(false); //GG
-		return -1;
 	}
 	byte[] bytecodeSetBlockID(int val, int mseIndex, byte[] invokevirt){
 		byte[] tag=getSetBlockID0Tag(mseIndex);

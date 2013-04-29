@@ -2,12 +2,13 @@ package org.javadynamicanalyzer;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javassist.bytecode.analysis.ControlFlow.Block;
-import GUI.GUIclass;
+
+import org.javadynamicanalyzer.gui.GUIclass;
 
 public class MethodNode {
 	class ExternalLink{ 
@@ -47,7 +48,7 @@ public class MethodNode {
 	Set<ExternalLink> eLinks=new HashSet<ExternalLink>();
 	Map<Block,BasicBlock> B2BBmap=new HashMap<Block,BasicBlock>();
 	GUIclass<BasicBlock> cfg=new GUIclass<BasicBlock>();
-	LinkedList<BasicBlockPath> plist=new LinkedList<BasicBlockPath>();
+	Set<BasicBlockPath> plist=new HashSet<BasicBlockPath>();
 	
 	long ttlTime=0;
 	long ttlTraversals=0;
@@ -55,7 +56,29 @@ public class MethodNode {
 	public MethodNode(String name){ cfg.setName(name); }
 	public MethodNode()			  { this("");   }
 	
-	public void addPath(BasicBlockPath bbp){ plist.add(bbp); }
+	public void addPath(BasicBlockPath bbp){ 
+		if(plist.contains(bbp)==false){
+			plist.add(bbp);
+			System.out.print(getName()+": ");
+			System.out.println(bbp);
+		}
+		else{
+			Iterator<BasicBlockPath> itr=plist.iterator();
+			boolean found=false;
+			while(itr.hasNext()){
+				BasicBlockPath plistBBP=itr.next();
+				if(plistBBP.equals(bbp)){
+					plistBBP.addTime(bbp.getTotalTime());
+					found=true;
+					break;
+				}
+			}
+			assert(found);
+		}
+		
+		//update the method's timing
+		addTime(bbp.getTotalTime());
+	}
 	public void addTime(long dt){
 		ttlTime+=dt;
 		++ttlTraversals;
@@ -95,8 +118,8 @@ public class MethodNode {
 	public boolean equals(MethodNode mn){ return mn.cfg.getName().equals(cfg.getName()); }
 	public int hashCode(){ return cfg.getName().hashCode(); }
 	public String toString(){ return cfg.getName(); }
-	public MethodNode getThis(){return this;}
-	public LinkedList<BasicBlockPath> getPlist(){return plist;}
+	public MethodNode getThis(){ return this;}
+	public Set<BasicBlockPath> getPaths(){ return plist;}
 	
 	//DELEGATE METHODS FROM GRAPH<T>
 	/**

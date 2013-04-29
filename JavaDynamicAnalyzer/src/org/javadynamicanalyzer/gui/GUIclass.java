@@ -1,4 +1,4 @@
-package GUI;
+package org.javadynamicanalyzer.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -271,7 +271,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 				if (subject instanceof BasicBlock) {
 					BasicBlock vertex = (BasicBlock) subject;
 					if (pickedState.isPicked(vertex)) {
-						for (BasicBlockPath bbp: vertex.getMethodNode().getPlist()){
+						for (BasicBlockPath bbp: vertex.getMethodNode().getPaths()){
 							for (final Integer bb : bbp.getPath()){
 								Transformer<Integer, Paint> vertexColor = new Transformer<Integer, Paint>() {
 									public Paint transform(Integer i) {

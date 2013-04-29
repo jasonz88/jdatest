@@ -9,8 +9,6 @@ public class BasicBlockPath {
 	long ttlTime=0;
 	long ttlTraversals=0;
 	
-	public boolean equals(Object o){ return blist.equals(o); }
-	
 	public void addBlock(int blockID) { blist.add(blockID); }
 	public void addTime(long l){ ttlTime+=l; ++ttlTraversals; }
 	public double getMeanTime() { 
@@ -20,4 +18,8 @@ public class BasicBlockPath {
 	public long getTraversals(){ return ttlTraversals; }
 	public long getTotalTime(){ return ttlTime; }
 	public Collection<Integer> getPath(){ return blist;}
+	
+	public String toString(){ return blist.toString(); }
+	public int hashCode(){ return blist.hashCode(); }
+	public boolean equals(Object o){ return blist.equals(o); }
 }

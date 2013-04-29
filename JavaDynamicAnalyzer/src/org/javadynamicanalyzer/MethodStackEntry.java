@@ -19,6 +19,15 @@ public class MethodStackEntry {
 			path.addBlock(i);
 	}
 	public void concludePath(){
-		mn.addPath(path);
+		if(path!=null)
+			mn.addPath(path);
+	}
+	public void concludePath(long dt){
+		if(path!=null){ //aka JDAtools.trackPaths==true
+			path.addTime(dt);
+			mn.addPath(path); //adds it to the method node time as well
+		}
+		else
+			mn.addTime(dt);
 	}
 }
