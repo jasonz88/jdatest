@@ -1,17 +1,18 @@
 package org.javadynamicanalyzer;
 
-import java.awt.Container;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JFrame;
 
 import org.javadynamicanalyzer.timer.BetterLinkedList;
 import org.javadynamicanalyzer.timer.TimestampList;
 
-import GUI.BalloonLayoutDemo;
-
 public class JDAtool {
+	//Options
+	public static boolean verbose=true;
+	public static boolean trackBlocks=true;
+	public static boolean trackPaths=true;
+	public static boolean trackTime=true;
+	
 	public static TimestampList tsl=new TimestampList();
 	public static String currentMethodName=null;
 	

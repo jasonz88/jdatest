@@ -6,11 +6,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.javadynamicanalyzer.graph.Graph;
-
-import GUI.GUIclass;
-
 import javassist.bytecode.analysis.ControlFlow.Block;
+import GUI.GUIclass;
 
 public class MethodNode {
 	class ExternalLink{ 
