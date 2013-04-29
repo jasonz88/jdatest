@@ -11,9 +11,9 @@ import javassist.bytecode.analysis.ControlFlow.Block;
 import org.javadynamicanalyzer.gui.GUIclass;
 
 public class MethodNode {
-	class ExternalLink{ 
-		int blockIndex=-1;
-		MethodNode target=null;
+	public class ExternalLink{ 
+		public int blockIndex=-1;
+		public MethodNode target=null;
 		public int hashCode(){ return blockIndex+target.hashCode(); }
 		public boolean equals(Object o){
 			if(o instanceof ExternalLink) 

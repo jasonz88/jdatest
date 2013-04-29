@@ -8,7 +8,7 @@ import org.javadynamicanalyzer.timer.TimestampList;
 
 public class JDAtool {
 	//Options
-	public static boolean verbose=false;
+	public static boolean verbose=true;
 	public static boolean trackBlocks=true;
 	public static boolean trackPaths=true;
 	public static boolean trackTime=true;
