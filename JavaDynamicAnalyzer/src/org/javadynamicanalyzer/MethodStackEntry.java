@@ -15,11 +15,11 @@ public class MethodStackEntry {
 	}
 	public void setBlockIndex(int i){
 		blockIndex=i;
-		if(path!=null) 
-			path.addBlock(i);
+		if(path!=null) //aka JDAtools.trackPaths==true
+			path.add(i);
 	}
 	public void concludePath(){
-		if(path!=null)
+		if(path!=null) //aka JDAtools.trackPaths==true
 			mn.addPath(path);
 	}
 	public void concludePath(long dt){

@@ -272,7 +272,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 					BasicBlock vertex = (BasicBlock) subject;
 					if (pickedState.isPicked(vertex)) {
 						for (BasicBlockPath bbp: vertex.getMethodNode().getPaths()){
-							for (final Integer bb : bbp.getPath()){
+							for (final Integer bb : bbp){
 								Transformer<Integer, Paint> vertexColor = new Transformer<Integer, Paint>() {
 									public Paint transform(Integer i) {
 										if(bb.equals(i)) {

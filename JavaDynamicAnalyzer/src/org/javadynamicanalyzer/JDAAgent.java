@@ -68,8 +68,6 @@ public class JDAAgent implements ClassFileTransformer {
 			if(className.contains(ign))
 				return classfileBuffer;
 		
-		System.out.println(className);
-		
 		byte[] out=classfileBuffer;
 		ClassPool pool=ClassPool.getDefault(); //sets the library search path to the default
 		
@@ -117,7 +115,6 @@ public class JDAAgent implements ClassFileTransformer {
 		try { m.addLocalVariable(mse, ClassPool.getDefault().get("org.javadynamicanalyzer.MethodStackEntry")); } 
 		catch (NotFoundException e) { e.printStackTrace(); }
 		int mseCSindex=m.getMethodInfo().getCodeAttribute().getMaxLocals()-1;
-		//System.out.println("mse: "+mseCSindex);
 		
 		String sw=null;
 		if(JDAtool.trackTime){

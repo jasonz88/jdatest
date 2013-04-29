@@ -30,7 +30,7 @@ public class MethodNode {
 			if(outgoing.size()>0){
 				out+=":";
 				for(ExternalLink el : outgoing)
-					out+=" "+el.target.getName();
+					out+=", "+el.target.getName();
 			}
 			return out;
 		}
@@ -59,21 +59,16 @@ public class MethodNode {
 	public void addPath(BasicBlockPath bbp){ 
 		if(plist.contains(bbp)==false){
 			plist.add(bbp);
-			System.out.print(getName()+": ");
-			System.out.println(bbp);
 		}
 		else{
 			Iterator<BasicBlockPath> itr=plist.iterator();
-			boolean found=false;
 			while(itr.hasNext()){
 				BasicBlockPath plistBBP=itr.next();
 				if(plistBBP.equals(bbp)){
 					plistBBP.addTime(bbp.getTotalTime());
-					found=true;
 					break;
 				}
 			}
-			assert(found);
 		}
 		
 		//update the method's timing
