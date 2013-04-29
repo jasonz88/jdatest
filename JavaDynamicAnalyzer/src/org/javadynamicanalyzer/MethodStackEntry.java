@@ -5,13 +5,20 @@ package org.javadynamicanalyzer;
 public class MethodStackEntry {
 	final public MethodNode mn;
 	public int blockIndex=-1;
+	BasicBlockPath path=null;
 	
 	public MethodStackEntry(String name){
 		mn=JDAtool.getMethodNode(name);
-		JDAtool.msl.add(this); 
+		JDAtool.msl.add(this);
+		if(JDAtool.trackPaths)
+			path=new BasicBlockPath();
 	}
 	public void setBlockIndex(int i){
-		System.out.println(mn.getName()+".BlockIndex="+i);
-		blockIndex=i; 
+		blockIndex=i;
+		if(path!=null) 
+			path.addBlock(i);
+	}
+	public void concludePath(){
+		mn.addPath(path);
 	}
 }

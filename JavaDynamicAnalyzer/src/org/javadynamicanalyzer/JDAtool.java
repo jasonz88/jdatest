@@ -7,6 +7,12 @@ import org.javadynamicanalyzer.timer.BetterLinkedList;
 import org.javadynamicanalyzer.timer.TimestampList;
 
 public class JDAtool {
+    //Options
+    static boolean trackTime=true;
+    static boolean trackBlocks=true;
+    static boolean trackPaths=true;
+    static boolean verbose=false;
+	
 	public static TimestampList tsl=new TimestampList();
 	public static String currentMethodName=null;
 	

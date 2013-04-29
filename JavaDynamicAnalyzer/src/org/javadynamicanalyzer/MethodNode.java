@@ -22,13 +22,13 @@ public class MethodNode {
 		}
 		public boolean equals(ExternalLink el){ return blockIndex==el.blockIndex && target.equals(el.target); }
 	}
-	class BasicBlock {
+	public class BasicBlock {
 		Block b;
 		public String toString(){ 
 			String out=Integer.toString(b.index());
 			Set<ExternalLink> outgoing=getExternalLinks(this);
 			if(outgoing.size()>0){
-				out+=":";
+				//out+="";
 				for(ExternalLink el : outgoing)
 					out+=" "+el.target.getName();
 			}
@@ -37,6 +37,7 @@ public class MethodNode {
 		BasicBlock(Block b){ this.b=b; } 
 		public int index(){ return b.index(); }
 		public String getMethodName(){ return getName(); }
+		public MethodNode getMethod(){ return getThis(); }
 		public boolean equals(Object o){ return b.equals(o); }
 		public boolean equals(BasicBlock that){ return b==that.b; } 
 		public boolean equals(int i){ return index()==i; }
@@ -48,6 +49,7 @@ public class MethodNode {
 	Map<Block,BasicBlock> B2BBmap=new HashMap<Block,BasicBlock>();
 	Graph<BasicBlock> cfg=new Graph<BasicBlock>();
 	LinkedList<BasicBlockPath> plist=new LinkedList<BasicBlockPath>();
+	BasicBlockPath lastPath=null;
 	
 	long ttlTime=0;
 	long ttlTraversals=0;
@@ -55,10 +57,15 @@ public class MethodNode {
 	public MethodNode(String name){ cfg.setName(name); }
 	public MethodNode()			  { this("");   }
 	
-	public void addPath(BasicBlockPath bbp){ plist.add(bbp); }
+	public void addPath(BasicBlockPath bbp){ plist.add(bbp); lastPath=bbp; }
 	public void addTime(long dt){
 		ttlTime+=dt;
 		++ttlTraversals;
+		
+		if(lastPath!=null){
+			lastPath.ttlTime+=dt;
+			++lastPath.ttlTraversals;
+		}
 	}
 	public double getMeanTime() { 
 		if(ttlTraversals==0) return 0;
@@ -95,6 +102,9 @@ public class MethodNode {
 	public boolean equals(MethodNode mn){ return mn.cfg.getName().equals(cfg.getName()); }
 	public int hashCode(){ return cfg.getName().hashCode(); }
 	public String toString(){ return cfg.getName(); }
+	
+	//UTILITY FUNCTION
+	MethodNode getThis(){ return this; }
 	
 	//DELEGATE METHODS FROM GRAPH<T>
 	/**

@@ -71,6 +71,11 @@ public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements It
 	
 	
 	public Collection<T> getNodes(){ return super.getVertices(); }
+	public T getRoot(){
+		for(T t : getNodes())
+			if(getInEdges(t).size()==0) return t;
+		return null;
+	}
 	
 	@Override
 	public Iterator<T> iterator(){ return nodeIterator(); }
