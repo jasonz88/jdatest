@@ -89,6 +89,7 @@ public class MethodNode {
 		B2BBmap.put(b, out);
 		return out;
 	}
+	
 	public void addEdge(Block a, Block b){
 		cfg.addEdge(getBasicBlock(a), getBasicBlock(b));
 	}
@@ -99,6 +100,7 @@ public class MethodNode {
 		elink.target=target;
 		eLinks.add(elink);
 	}
+	
 	public Set<ExternalLink> getExternalLinks(){ return eLinks; }
 	public Set<ExternalLink> getExternalLinks(int BasicBlockID){
 		Set<ExternalLink> out=new HashSet<ExternalLink>();
@@ -110,11 +112,12 @@ public class MethodNode {
 	public Set<ExternalLink> getExternalLinks(BasicBlock b){ return getExternalLinks(b.index()); }
 	public Set<ExternalLink> getExternalLinks(Block b){ return getExternalLinks(getBasicBlock(b)); }
 	
+	public Set<BasicBlockPath> getPaths(){ return plist;}
+	
 	public boolean equals(MethodNode mn){ return mn.cfg.getName().equals(cfg.getName()); }
 	public int hashCode(){ return cfg.getName().hashCode(); }
 	public String toString(){ return cfg.getName(); }
 	public MethodNode getThis(){ return this;}
-	public Set<BasicBlockPath> getPaths(){ return plist;}
 	
 	//DELEGATE METHODS FROM GRAPH<T>
 	/**
