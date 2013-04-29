@@ -5,6 +5,7 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javassist.CannotCompileException;
@@ -15,9 +16,9 @@ import javassist.NotFoundException;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.Bytecode;
 import javassist.bytecode.CodeIterator;
+import javassist.bytecode.ConstPool;
 import javassist.bytecode.analysis.ControlFlow;
 import javassist.bytecode.analysis.ControlFlow.Block;
-import cern.colt.Arrays;
 
 
 public class JDAAgent implements ClassFileTransformer {
@@ -103,14 +104,13 @@ public class JDAAgent implements ClassFileTransformer {
 		try {
 			//Read the byte array
 			cc = pool.makeClass(new java.io.ByteArrayInputStream(classfileBuffer));
+			if(cc.isInterface()) return classfileBuffer;
 			if(JDAtool.verbose)
 				System.out.println("Analyzing "+cc.getName());
 			
 			//Read the methods
 			CtClassDetails.getMethodsDerived(cc);
 			for(CtMethod m : CtClassDetails.getMethodsDerived(cc)){
-				if(JDAtool.verbose)
-					System.out.println("Instrumenting: " + m.getName());
 				instrumentMethod(m);
 			}
 			
@@ -130,6 +130,9 @@ public class JDAAgent implements ClassFileTransformer {
 	
 	void instrumentMethod(CtMethod m) throws CannotCompileException, BadBytecode{
 		String methodName=m.getLongName();	
+		if(JDAtool.verbose)
+			System.out.println("Instrumenting: " + methodName);
+		
 		boolean isMain=methodName.contains("main");
 		
 		String mse=var("mse");
@@ -176,26 +179,24 @@ public class JDAAgent implements ClassFileTransformer {
 		methodEntry="{ " + methodEntry + "}";
 		if(JDAtool.verbose)
 			System.out.println("Before: "+methodEntry);
+		m.insertBefore(methodEntry); //we don't need anything fancy if we don't track paths
 		
-		if(JDAtool.trackPaths==false)
-			m.insertBefore(methodEntry); //we don't need anything fancy if we don't track paths
-		else{ //fancy shit...
-			//remember untouched byte array
-			byte[] bytes0=m.getMethodInfo2().getCodeAttribute().getCode().clone();
-			//insert the beginning instrumentation
-			m.insertBefore(methodEntry);
-			//now find the difference
-			byte[] bytesf=m.getMethodInfo2().getCodeAttribute().getCode();
-			List<Byte> inst=diff(bytes0,bytesf);
+		if(JDAtool.trackPaths){ 
+			//find the invokevirtual index of setBlockIndex
+			ConstPool cp=m.getMethodInfo().getConstPool();
+			//byte[] invokeVirtualIndex=null;
+			int index=0;
+			boolean found=false;
+			while(found==false){
+				try{ 
+					String s=cp.getUtf8Info(index++);
+					if(s.equals("setBlockIndex")) found=true;
+				}
+				catch(NullPointerException | ClassCastException e){}
+			}
+			++index;
 			
-			//System.out.println("Instrument: "+inst);
-			
-			//We know the stack index of mse, so get the expected bytecode that uses it
-			byte[] tag=getSetBlockID0Tag(mseCSindex);
-			//now find that bytecode in the instrumented code
-			int index=findMatch(inst,tag);
-			//from here, we can extrapolate the invokevirtual index for setBlockID
-			byte[] invokeVirtualIndex=new byte[]{inst.get(index+tag.length),inst.get(index+tag.length+1)};
+			byte[] invokeVirtualIndex=new byte[]{(byte) (index<<8),(byte) (index & 0xFF)};
 			
 			//INSERTED AT BASIC BLOCKS
 			int len=new ControlFlow(m).basicBlocks().length;

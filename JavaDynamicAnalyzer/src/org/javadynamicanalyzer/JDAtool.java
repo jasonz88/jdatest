@@ -11,7 +11,7 @@ public class JDAtool {
     static boolean trackTime=true;
     static boolean trackBlocks=true;
     static boolean trackPaths=true;
-    static boolean verbose=false;
+    static boolean verbose=true;
 	
 	public static TimestampList tsl=new TimestampList();
 	public static String currentMethodName=null;
