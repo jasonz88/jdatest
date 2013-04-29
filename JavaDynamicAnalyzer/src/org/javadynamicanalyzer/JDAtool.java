@@ -1,10 +1,15 @@
 package org.javadynamicanalyzer;
 
+import java.awt.Container;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
+
 import org.javadynamicanalyzer.timer.BetterLinkedList;
 import org.javadynamicanalyzer.timer.TimestampList;
+
+import GUI.BalloonLayoutDemo;
 
 public class JDAtool {
 	public static TimestampList tsl=new TimestampList();
@@ -29,7 +34,7 @@ public class JDAtool {
 	public static void gui(){
 		for(String key : cfgMap.keySet()){
 			MethodNode mn=cfgMap.get(key);
-			mn.getVisual();
+			mn.getVisual(mn.getName()+mn.getMeanTime());
 		}
 	}
 }

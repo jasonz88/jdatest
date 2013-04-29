@@ -63,9 +63,10 @@ public class Graph<T> extends DirectedSparseMultigraph<T, Edge<T>> implements It
 	public void getVisual(String name){
         JFrame frame = new JFrame(name);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(visual); 
+        frame.getContentPane().add(visual);
+        
         frame.pack();
-        frame.setVisible(true); 
+        frame.setVisible(true);
 	}
 	public void getVisual(){ getVisual(toString()); }
 	

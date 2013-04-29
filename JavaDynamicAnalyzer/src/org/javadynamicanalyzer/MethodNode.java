@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.javadynamicanalyzer.graph.Graph;
 
+import GUI.GUIclass;
+
 import javassist.bytecode.analysis.ControlFlow.Block;
 
 public class MethodNode {
@@ -22,7 +24,7 @@ public class MethodNode {
 		}
 		public boolean equals(ExternalLink el){ return blockIndex==el.blockIndex && target.equals(el.target); }
 	}
-	class BasicBlock {
+	public class BasicBlock {
 		Block b;
 		public String toString(){ 
 			String out=Integer.toString(b.index());
@@ -42,11 +44,12 @@ public class MethodNode {
 		public boolean equals(int i){ return index()==i; }
 		public boolean equals(Integer i){ return i.equals(index()); }
 		public int hashCode(){ return b.hashCode(); }
+		public MethodNode getMethodNode(){return getThis();}
 	}
 	
 	Set<ExternalLink> eLinks=new HashSet<ExternalLink>();
 	Map<Block,BasicBlock> B2BBmap=new HashMap<Block,BasicBlock>();
-	Graph<BasicBlock> cfg=new Graph<BasicBlock>();
+	GUIclass<BasicBlock> cfg=new GUIclass<BasicBlock>();
 	LinkedList<BasicBlockPath> plist=new LinkedList<BasicBlockPath>();
 	
 	long ttlTime=0;
@@ -95,6 +98,8 @@ public class MethodNode {
 	public boolean equals(MethodNode mn){ return mn.cfg.getName().equals(cfg.getName()); }
 	public int hashCode(){ return cfg.getName().hashCode(); }
 	public String toString(){ return cfg.getName(); }
+	public MethodNode getThis(){return this;}
+	public LinkedList<BasicBlockPath> getPlist(){return plist;}
 	
 	//DELEGATE METHODS FROM GRAPH<T>
 	/**

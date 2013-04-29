@@ -11,7 +11,7 @@ public class MethodStackEntry {
 		JDAtool.msl.add(this); 
 	}
 	public void setBlockIndex(int i){
-		System.out.println(mn.getName()+".BlockIndex="+i);
+		//System.out.println(mn.getName()+".BlockIndex="+i);
 		blockIndex=i; 
 	}
 }

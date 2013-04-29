@@ -18,12 +18,13 @@ import javassist.bytecode.analysis.ControlFlow.Block;
 public class JDAAgent implements ClassFileTransformer {
 	//System Libraries
 	final static String[] ignore = new String[]{ 
-		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "jung/", "apache/"};
+		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "jung/", "apache/","GUI/"};
 	
     //Package names
     static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
     								  "org.javadynamicanalyzer.MethodStackEntry",
-    								  "org.javadynamicanalyzer.graph.BasicBlockPath",
+    								  "org.javadynamicanalyzer.BasicBlockPath",
+    								  "GUI.BalloonLayoutDemo",
     								  "org.javadynamicanalyzer.timer.Stopwatch"};
     
     //Options
@@ -111,11 +112,22 @@ public class JDAAgent implements ClassFileTransformer {
 			CtClassDetails.getMethodsDerived(cc);
 			for(CtMethod m : CtClassDetails.getMethodsDerived(cc)){
 				System.out.println("Instrumenting: " + m.getName());
-				instrumentMethod(m);
+				try {
+					instrumentMethod(m);
+				} catch (CannotCompileException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (BadBytecode e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			out=cc.toBytecode();
 		} 
-		catch (IOException | RuntimeException | CannotCompileException | BadBytecode e) { e.printStackTrace(); }
+		catch (IOException e) { e.printStackTrace(); } catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		finally { 
 			if(cc!=null)
 				cc.detach();

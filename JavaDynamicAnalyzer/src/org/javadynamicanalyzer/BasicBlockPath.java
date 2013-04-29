@@ -1,10 +1,11 @@
 package org.javadynamicanalyzer;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
 //BasicBlockPath can't be an inner class of MethodNode because it will fuck up Javassist.
 public class BasicBlockPath {
-	LinkedList<Integer> blist=new LinkedList<Integer>();
+	Collection<Integer> blist=new LinkedList<Integer>();
 	long ttlTime=0;
 	long ttlTraversals=0;
 	
@@ -18,4 +19,5 @@ public class BasicBlockPath {
 	}
 	public long getTraversals(){ return ttlTraversals; }
 	public long getTotalTime(){ return ttlTime; }
+	public Collection<Integer> getPath(){return blist;}
 }

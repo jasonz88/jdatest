@@ -1,8 +1,8 @@
 package org.javadynamicanalyzer.graph;
 
 public class Edge<T> {
-	T src;
-	T dst;
+	public T src;
+	public T dst;
 	public Edge(T source, T destination){
 		src=source;
 		dst=destination;
