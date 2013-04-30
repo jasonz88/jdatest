@@ -1,5 +1,6 @@
 package org.javadynamicanalyzer.gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -37,6 +38,8 @@ import javax.swing.JPanel;
 
 
 import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.functors.ChainedTransformer;
+import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.javadynamicanalyzer.graph.Edge;
 import org.javadynamicanalyzer.graph.Graph;
 import org.javadynamicanalyzer.BasicBlockPath;
@@ -57,6 +60,9 @@ import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedState;
+import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
+import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
+import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 
 
 @SuppressWarnings("serial")
@@ -151,6 +157,30 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		//		add a listener for ToolTips
 		vv.setVertexToolTipTransformer(new ToStringLabeller());
 		//		vv.getRenderContext().setArrowFillPaintTransformer(new EdgeShape.QuadCurve<T, Edge<T>>());
+		
+		// this class will provide both label drawing and vertex shapes
+        VertexLabelAsShapeRenderer<T, Edge<T>> vlasr = new VertexLabelAsShapeRenderer<T, Edge<T>>(vv.getRenderContext());
+        
+        // customize the render context
+        vv.getRenderContext().setVertexLabelTransformer(
+        		(Transformer<T, String>) // this chains together Transformers so that the html tags
+        		// are prepended to the toString method output
+        		new ChainedTransformer<String,String>(new Transformer[]{
+        		new ToStringLabeller<String>(),
+        		new Transformer<String,String>() {
+					public String transform(String input) {
+						return input;
+					}}}));
+        vv.getRenderContext().setVertexShapeTransformer(vlasr);
+//        vv.getRenderContext().setVertexLabelRenderer(new DefaultVertexLabelRenderer(Color.red));
+//        vv.getRenderContext().setEdgeDrawPaintTransformer(new ConstantTransformer(Color.black));
+//        vv.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(2.5f)));
+        
+        // customize the renderer
+//        vv.getRenderer().setVertexRenderer(new GradientVertexRenderer<T, Edge<T>>(Color.gray, Color.white, true));
+        vv.getRenderer().setVertexLabelRenderer(vlasr);
+
+//        vv.setBackground(Color.black);
 
 		Container content =  getContentPane();
 		final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
@@ -364,6 +394,18 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		return newdepth;
 	}
 
+	public void adjustLabel(){
+		for(T t: graph.getVertices()){
+			if (t instanceof BasicBlock){
+				BasicBlock vertex=(BasicBlock) t;
+				if(vertex.getMethodNode().getExternalLinks(vertex).isEmpty()){
+					
+				}
+			}
+			
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void Highlight(VisualizationViewer<T, Edge<T>> vv, final Integer bb){
 

@@ -169,7 +169,7 @@ public class JDAAgent implements ClassFileTransformer {
 				}
 				catch(NullPointerException | ClassCastException e){}
 			}
-			++index;
+			index++;
 			
 			byte[] invokeVirtualIndex=new byte[]{(byte) (index<<8),(byte) (index & 0xFF)};
 			
