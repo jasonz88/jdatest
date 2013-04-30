@@ -7,7 +7,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -16,8 +15,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,7 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.apache.commons.collections15.Transformer;
-import org.apache.commons.collections15.functors.ChainedTransformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.javadynamicanalyzer.BasicBlockPath;
 import org.javadynamicanalyzer.MethodNode.BasicBlock;
@@ -377,7 +373,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
 				if(bbp.contains(bb.index())) {
-					System.out.println("I am here!");
+					//System.out.println("I am here!");
 					return Color.GREEN;
 				}
 				return Color.RED;

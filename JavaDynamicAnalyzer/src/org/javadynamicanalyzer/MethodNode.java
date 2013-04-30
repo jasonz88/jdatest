@@ -42,6 +42,7 @@ public class MethodNode {
 		public boolean equals(int i){ return index()==i; }
 		public boolean equals(Integer i){ return i.equals(index()); }
 		public Set<ExternalLink> getExternalLinks(){ return MethodNode.this.getExternalLinks(this); }
+		public Set<BasicBlockPath> getPaths() { return MethodNode.this.getPaths(this.index()); }
 		public int hashCode(){ return b.hashCode(); }
 		public MethodNode getMethodNode(){return getThis();}
 	}
@@ -114,6 +115,14 @@ public class MethodNode {
 	public Set<ExternalLink> getExternalLinks(Block b){ return getExternalLinks(getBasicBlock(b)); }
 	
 	public Set<BasicBlockPath> getPaths(){ return plist;}
+	public Set<BasicBlockPath> getPaths(int BasicBlockID){
+		Set<BasicBlockPath> out=new HashSet<BasicBlockPath>();
+		for(BasicBlockPath bbp : plist)
+			if(bbp.contains(BasicBlockID))
+				out.add(bbp);
+		return out;
+	}
+	public Set<BasicBlockPath> getPaths(BasicBlock bb){ return getPaths(bb.index()); }
 	
 	public boolean equals(MethodNode mn){ return mn.cfg.getName().equals(cfg.getName()); }
 	public int hashCode(){ return cfg.getName().hashCode(); }
