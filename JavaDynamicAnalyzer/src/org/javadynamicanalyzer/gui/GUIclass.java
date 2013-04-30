@@ -378,7 +378,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
 				if(bbp.contains(bb.index())) {
-					System.out.println("CALLED");
 					return actcol;
 				}
 				return Color.RED;
