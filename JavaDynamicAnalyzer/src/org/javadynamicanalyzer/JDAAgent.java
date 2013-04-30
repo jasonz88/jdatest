@@ -25,15 +25,17 @@ public class JDAAgent implements ClassFileTransformer {
 	final static String[] ignore = new String[]{ 
 		"sun/", "java/", "javax/", "javassist/", "javadynamicanalyzer/", "jung/", "apache/"};
 	
+	static Parser inputs=new Parser();
+	
     //Package names
     static final String[] toolImport={"org.javadynamicanalyzer.JDAtool",
     								  "org.javadynamicanalyzer.MethodStackEntry",
+    								  "org.javadynamicanalyzer.MethodNode",
     								  "org.javadynamicanalyzer.BasicBlockPath",
     								  "org.javadynamicanalyzer.timer.Stopwatch"};
 	
 	//Statically load javaagent at startup
-    public static void premain(String args, Instrumentation inst) {
-    	
+    public static void premain(String args, Instrumentation inst) {    	
     	JDAAgent jda = new JDAAgent(inst);
     	inst.addTransformer(jda);
     	
@@ -44,6 +46,13 @@ public class JDAAgent implements ClassFileTransformer {
     			cp.get(imp);
 		} 
     	catch (NotFoundException e) { e.printStackTrace(); }
+    	
+    	//Parse instrumentation arguments
+    	inputs.parse(args);
+    	if(inputs.get("verbose")==0) JDAtool.verbose=false;
+    	if(inputs.get("trackBlocks")==0) JDAtool.trackBlocks=false;
+    	if(inputs.get("trackPaths")==0) JDAtool.trackPaths=false;
+    	if(inputs.get("trackTime")==0) JDAtool.trackTime=false;
     }
     //Dynamic load javaagent when application is already running
     public static void agentmain(String args, Instrumentation inst) throws Exception {
@@ -80,6 +89,7 @@ public class JDAAgent implements ClassFileTransformer {
 		try {
 			//Read the byte array
 			cc = pool.makeClass(new java.io.ByteArrayInputStream(classfileBuffer));
+			
 			if(cc.isInterface()) return classfileBuffer;
 			if(JDAtool.verbose)
 				System.out.println("Analyzing "+cc.getName());
@@ -106,10 +116,30 @@ public class JDAAgent implements ClassFileTransformer {
 	
 	void instrumentMethod(CtMethod m) throws CannotCompileException, BadBytecode{
 		String methodName=m.getLongName();	
+		boolean isMain=methodName.contains("main");
+		
+		boolean skip=true;
+		for (String s : inputs){
+			if(methodName.contains(s)){
+				skip=false;
+				break;
+			}
+		}
+		if(skip && inputs.size()>0){
+			if(isMain){
+				String mse=var("mse");
+				try { m.addLocalVariable(mse, ClassPool.getDefault().get("org.javadynamicanalyzer.MethodStackEntry")); } 
+				catch (NotFoundException e) { e.printStackTrace(); }
+				m.insertBefore(mse+"=new MethodStackEntry(\""+methodName+"\"); ");
+				m.insertAfter("JDAtool.gui(); ");
+			}
+			if(JDAtool.verbose)
+				System.out.println("Skipped: "+methodName);
+			return;
+		}
+		
 		if(JDAtool.verbose)
 			System.out.println("Instrumenting: " + methodName);
-		
-		boolean isMain=methodName.contains("main");
 		
 		String mse=var("mse");
 		try { m.addLocalVariable(mse, ClassPool.getDefault().get("org.javadynamicanalyzer.MethodStackEntry")); } 
@@ -168,10 +198,7 @@ public class JDAAgent implements ClassFileTransformer {
 					int id=cp.isMember("org.javadynamicanalyzer.MethodStackEntry", "setBlockIndex", index);
 					if(id!=0){
 						found=true;
-						//System.out.println("ID FOUND: "+id+" myID: "+index);
 					}
-					//System.out.print(cp.getMethodrefClassName(index));
-					//System.out.println("\t"+cp.getMethodrefName(index));
 				}
 				catch(NullPointerException | ClassCastException e){}
 			}

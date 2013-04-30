@@ -1,12 +1,9 @@
 package org.javadynamicanalyzer.gui;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.Shape;
@@ -21,7 +18,6 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,15 +26,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.apache.commons.collections15.Transformer;
-import org.apache.commons.collections15.functors.ChainedTransformer;
-import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.javadynamicanalyzer.BasicBlockPath;
 import org.javadynamicanalyzer.MethodNode.BasicBlock;
 import org.javadynamicanalyzer.graph.Edge;
@@ -58,10 +51,7 @@ import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedState;
-import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
-import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
 import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
-import edu.uci.ics.jung.visualization.renderers.VertexLabelRenderer;
 
 
 @SuppressWarnings("serial")
@@ -388,7 +378,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
 				if(bbp.contains(bb.index())) {
-
 					return actcol;
 				}
 				return Color.RED;

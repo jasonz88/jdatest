@@ -22,7 +22,7 @@ public class JDAtool {
 	
 	public static MethodNode getMethodNode(String methodName){
 		if(cfgMap.containsKey(methodName)==false){	
-			MethodNode out=new MethodNode(methodName);			
+			MethodNode out=new MethodNode(methodName);
 			cfgMap.put(methodName, out);
 			return out;
 		}
