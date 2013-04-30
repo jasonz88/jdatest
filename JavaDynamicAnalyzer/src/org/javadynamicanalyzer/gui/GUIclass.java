@@ -1,5 +1,6 @@
 package org.javadynamicanalyzer.gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -32,6 +33,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.functors.ChainedTransformer;
+import org.apache.commons.collections15.functors.ConstantTransformer;
 import org.javadynamicanalyzer.BasicBlockPath;
 import org.javadynamicanalyzer.MethodNode.BasicBlock;
 import org.javadynamicanalyzer.graph.Edge;
@@ -51,6 +54,9 @@ import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedState;
+import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
+import edu.uci.ics.jung.visualization.renderers.GradientVertexRenderer;
+import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 
 
 @SuppressWarnings("serial")
@@ -106,26 +112,26 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	//MouseWheel to scale. When scale < 1, view is scaled. When scale > 1, layout is scaled.
 
 	static final String instructions = 
-		"<html>"+
-		"<b><h2><center>Mouse listeners:</center></h2></b>"+
-		"<p>Picking Mode::"+
-		"<ul>"+
-		"<li>MouseButtonOne press on a Vertex or Edge to select it"+
-		"<li>MouseButtonOne+Shift press on a Vertex or Edge to add or toggle selection"+
-		"<li>MouseButtonOne+drag on a Vertex to move all selected vertices"+
-		"<li>MouseButtonOne+drag to select Vertices in a rectangle"+
-		"<li>MouseButtonOne+Shift+drag to add to selection with Vertices in a rectangle"+
-		"</ul>"+
-		"<p>TransformingMode:"+
-		"<ul>"+
-		"<li>MouseButtonOne+drag to translate the display"+
-		"<li>MouseButtonOne+Shift+drag to rotate the display"+
-		"<li>MouseButtonOne+ctrl(or Command)+drag to shear the display"+
-		"</ul>"+
-		"<p>Both Modes"+
-		"<ul>"+
-		"<li>MouseWheel to scale. When scale < 1, view is scaled. When scale > 1, layout is scaled."+
-		"</ul>";
+	"<html>"+
+			"<b><h2><center>Mouse listeners:</center></h2></b>"+
+			"<p>Picking Mode::"+
+			"<ul>"+
+			"<li>MouseButtonOne press on a Vertex or Edge to select it"+
+			"<li>MouseButtonOne+Shift press on a Vertex or Edge to add or toggle selection"+
+			"<li>MouseButtonOne+drag on a Vertex to move all selected vertices"+
+			"<li>MouseButtonOne+drag to select Vertices in a rectangle"+
+			"<li>MouseButtonOne+Shift+drag to add to selection with Vertices in a rectangle"+
+			"</ul>"+
+			"<p>TransformingMode:"+
+			"<ul>"+
+			"<li>MouseButtonOne+drag to translate the display"+
+			"<li>MouseButtonOne+Shift+drag to rotate the display"+
+			"<li>MouseButtonOne+ctrl(or Command)+drag to shear the display"+
+			"</ul>"+
+			"<p>Both Modes"+
+			"<ul>"+
+			"<li>MouseWheel to scale. When scale < 1, view is scaled. When scale > 1, layout is scaled."+
+			"</ul>";
 
 	JDialog helpDialog;
 
@@ -146,7 +152,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		vv.setVertexToolTipTransformer(new ToStringLabeller());
 		//		vv.getRenderContext().setArrowFillPaintTransformer(new EdgeShape.QuadCurve<T, Edge<T>>());
 
-//        vv.setBackground(Color.black);
+		//        vv.setBackground(Color.black);
 
 		Container content =  getContentPane();
 		final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
@@ -254,6 +260,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		content.add(controls, BorderLayout.SOUTH);
 
 		adjustLayout();
+		showActiveNode();
+//		adjustLabel();
 		final PickedState<BasicBlock> pickedState = (PickedState<BasicBlock>) vv.getPickedVertexState();
 
 		// Attach the listener that will print when the vertices selection changes.
@@ -268,32 +276,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 					BasicBlock vertex = (BasicBlock) subject;
 					if (pickedState.isPicked(vertex)) {
 						for (BasicBlockPath bbp: vertex.getMethodNode().getPaths()){
-							for (final Integer bb : bbp){
-								Transformer<Integer, Paint> vertexColor = new Transformer<Integer, Paint>() {
-									public Paint transform(Integer i) {
-										if(bb.equals(i)) {
-											System.out.println("I am here!");
-											return Color.GREEN;
-										}
-										return Color.RED;
-									}
-								};
-								Transformer<Integer, Shape> vertexSize = new Transformer<Integer, Shape>(){
-									public Shape transform(Integer i){
-										Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
-										// in this case, the vertex is twice as large
-										if(bb.equals(i)) {
-											System.out.println("I am here!");
-											return AffineTransform.getScaleInstance(2, 2).createTransformedShape(circle);
-										}
-										else return circle;
-									}
-								};
-
-
-								vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
-								vv.getRenderContext().setVertexShapeTransformer((Transformer<T, Shape>) vertexSize);
-							}
+							changeVertexSizeColor(bbp);
 						}
 						System.out.println("Vertex " + vertex
 								+ " is now selected");
@@ -304,10 +287,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 				}
 			}
 		});
-
-
-
-
 
 
 
@@ -330,48 +309,136 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 				visited.add(t);
 				Point2D v=layout.transform(t);
 				v.setLocation(300,10);
-				depth=adjustLayoutNeib(graph.getSuccessors(t),60,visited);
+				depth=adjustLayoutNeib(graph.getSuccessors(t),60, 300, visited);
 				break;
 			}
 		}
+		double xax=300;
 		for(T t: graph.getVertices()){
 			if(graph.getOutEdges(t).size()==0){
 				Point2D v=layout.transform(t);
-				v.setLocation(300,depth+50);
-				break;
+				v.setLocation(xax,depth+50);
+				xax+=50;
 			}
 		}
 	}
 
-	public double adjustLayoutNeib(Collection<T> curLevel, double depth, Collection<T> visited){
+	public double adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){
 		if (curLevel.isEmpty()) return depth;
 		double newdepth=0;
 		double rv=0;
-		double xax=0;
 		for (T t: curLevel){
 			if (visited.contains(t)) continue;
 			visited.add(t);
 			Point2D v=layout.transform(t);
-			v.setLocation(300+xax, depth);
-			rv=adjustLayoutNeib(graph.getSuccessors(t),depth+50, visited);
+			v.setLocation(width, depth);
+			rv=adjustLayoutNeib(graph.getSuccessors(t),depth+50, width, visited);
 			newdepth=rv>newdepth? rv: newdepth;
-			xax+=50;
+			width+=50;
 		}
 		return newdepth;
 	}
 
-	public void adjustLabel(){
-		for(T t: graph.getVertices()){
-			if (t instanceof BasicBlock){
-				BasicBlock vertex=(BasicBlock) t;
-				if(vertex.getMethodNode().getExternalLinks(vertex).isEmpty()){
-					
+
+	public void showActiveNode(){
+		for(T t : graph.getVertices()){
+			if(t instanceof BasicBlock){
+				BasicBlock vertex=(BasicBlock)t;
+				for (BasicBlockPath bbp: vertex.getMethodNode().getPaths()){
+					changeVertexSizeColor(bbp);
 				}
 			}
-			
 		}
 	}
 	
+	public void adjustLabel(){
+//		for(T t: graph.getVertices()){
+//			if (t instanceof BasicBlock){
+//				final BasicBlock vertex=(BasicBlock) t;
+//				if(vertex.getMethodNode().getExternalLinks(vertex).isEmpty()){
+					//					Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
+					//						public Paint transform(BasicBlock i) {
+					//							if(vertex.equals(i)) {
+					//								System.out.println("I am here!");
+					//								return Color.GREEN;
+					//							}
+					//							return Color.RED;
+					//						}
+					//					};
+					//					vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
+					changeVertexShape();
+//				}
+//			}
+//
+//		}
+	}
+
+	public void changeVertexSizeColor(final BasicBlockPath bbp){
+		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
+			public Paint transform(BasicBlock bb) {
+				if(bbp.contains(bb.index())) {
+					System.out.println("I am here!");
+					return Color.GREEN;
+				}
+				return Color.RED;
+			}
+		};
+		//		Transformer<BasicBlock, Shape> vertexSize = new Transformer<BasicBlock, Shape>(){
+		//			public Shape transform(BasicBlock i){
+		//				Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
+		//				// in this case, the vertex is twice as large
+		//				if(vertex.equals(i)) {
+		//					System.out.println("I am here!");
+		//					return AffineTransform.getScaleInstance(2, 2).createTransformedShape(circle);
+		//				}
+		//				else return circle;
+		//			}
+		//		};
+
+
+		vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
+		//		vv.getRenderContext().setVertexShapeTransformer((Transformer<T, Shape>) vertexSize);
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public void changeVertexShape(){
+		// this class will provide both label drawing and vertex shapes
+		VertexLabelAsShapeRenderer<T, Edge<T>> vlasr = new VertexLabelAsShapeRenderer<T, Edge<T>>(vv.getRenderContext());
+
+		// customize the render context
+		vv.getRenderContext().setVertexLabelTransformer(
+				(Transformer<T, String>) new Transformer<BasicBlock,String>() {
+					public String transform(BasicBlock i) {
+						//						i.getMethodNode().getExternalLinks(i).iterator().next().target.getName();
+						if(i.getMethodNode().getExternalLinks(i).isEmpty()) 
+							return "<html><center>"+i+"<p>";
+						else return i.toString();
+					}});
+		/*
+        		(Transformer<T, String>) // this chains together Transformers so that the html tags
+        		// are prepended to the toString method output
+        		new ChainedTransformer<BasicBlock,String>(new Transformer[]{
+        		new ToStringLabeller<String>(),
+        		new Transformer<BasicBlock,String>() {
+					public String transform(BasicBlock i) {
+						if(vertex.equals(i)) {
+						return "<html><center>"+i+"<p>";
+						}
+						else return i.toString();
+					}}}));
+		 */
+		vv.getRenderContext().setVertexShapeTransformer(vlasr);
+		vv.getRenderContext().setVertexLabelRenderer(new DefaultVertexLabelRenderer(Color.red));
+		vv.getRenderContext().setEdgeDrawPaintTransformer(new ConstantTransformer(Color.yellow));
+		vv.getRenderContext().setEdgeStrokeTransformer(new ConstantTransformer(new BasicStroke(2.5f)));
+
+		// customize the renderer
+		vv.getRenderer().setVertexRenderer(new GradientVertexRenderer<T,Edge<T>>(Color.gray, Color.white, true));
+		vv.getRenderer().setVertexLabelRenderer(vlasr);
+	}
+
+
 	@SuppressWarnings("unchecked")
 	public void Highlight(VisualizationViewer<T, Edge<T>> vv, final Integer bb){
 
