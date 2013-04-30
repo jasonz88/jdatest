@@ -160,28 +160,21 @@ public class JDAAgent implements ClassFileTransformer {
 			//find the invokevirtual index of setBlockIndex
 			ConstPool cp=m.getMethodInfo().getConstPool();
 			//cp.print();
-			int index=0;
+			int index=-1;
 			boolean found=false;
 			while(found==false){
 				++index;
 				try{ 
-					//String s=cp.getUtf8Info(index);
 					int id=cp.isMember("org.javadynamicanalyzer.MethodStackEntry", "setBlockIndex", index);
 					if(id!=0){
 						found=true;
 						//System.out.println("ID FOUND: "+id+" myID: "+index);
-						//index=cp.getMethodHandleIndex(id);
-						//System.out.println("ID FOUND: "+id+" myID: "+index);
 					}
 					//System.out.print(cp.getMethodrefClassName(index));
 					//System.out.println("\t"+cp.getMethodrefName(index));
-					//if(s.equals("setBlockIndex")){
-						//found=true;
-					//}
 				}
 				catch(NullPointerException | ClassCastException e){}
 			}
-			//++index;
 			
 			int[] invokeVirtualIndex=new int[]{index>>8, index & 0xFF};
 			

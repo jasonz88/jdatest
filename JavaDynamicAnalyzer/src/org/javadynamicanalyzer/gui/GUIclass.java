@@ -146,6 +146,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		vv.setVertexToolTipTransformer(new ToStringLabeller());
 		//		vv.getRenderContext().setArrowFillPaintTransformer(new EdgeShape.QuadCurve<T, Edge<T>>());
 
+//        vv.setBackground(Color.black);
+
 		Container content =  getContentPane();
 		final GraphZoomScrollPane panel = new GraphZoomScrollPane(vv);
 		content.add(panel);
@@ -358,6 +360,18 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		return newdepth;
 	}
 
+	public void adjustLabel(){
+		for(T t: graph.getVertices()){
+			if (t instanceof BasicBlock){
+				BasicBlock vertex=(BasicBlock) t;
+				if(vertex.getMethodNode().getExternalLinks(vertex).isEmpty()){
+					
+				}
+			}
+			
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void Highlight(VisualizationViewer<T, Edge<T>> vv, final Integer bb){
 
