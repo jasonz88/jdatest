@@ -348,7 +348,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		BasicBlockPath col=new BasicBlockPath();
 		for (BasicBlockPath bbp: ((BasicBlock) graph.getVertices().iterator().next()).getMethodNode().getPaths())
 			col.addAll(bbp);
-		System.out.println("CALLED");
 		changeVertexSizeColor(col,Color.green);
 	}
 

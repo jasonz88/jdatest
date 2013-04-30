@@ -114,7 +114,7 @@ public class MethodNode {
 	public Set<ExternalLink> getExternalLinks(BasicBlock b){ return getExternalLinks(b.index()); }
 	public Set<ExternalLink> getExternalLinks(Block b){ return getExternalLinks(getBasicBlock(b)); }
 	
-	public Set<BasicBlockPath> getPaths(){ return plist;}
+	public Set<BasicBlockPath> getPaths(){ return plist; }
 	public Set<BasicBlockPath> getPaths(int BasicBlockID){
 		Set<BasicBlockPath> out=new HashSet<BasicBlockPath>();
 		for(BasicBlockPath bbp : plist)
