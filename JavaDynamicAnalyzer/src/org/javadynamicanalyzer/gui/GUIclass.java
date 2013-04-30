@@ -130,7 +130,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 	JDialog helpDialog;
 
-
+	static BasicBlockPath prev_bbp;
+	
 	@SuppressWarnings("unchecked")
 
 
@@ -263,6 +264,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		showActiveNode();
 		adjustLabel();
 
+		
 
 		// Attach the listener that will print when the vertices selection changes.
 		pickedState.addItemListener(new ItemListener(){
@@ -276,11 +278,12 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 					BasicBlock vertex = (BasicBlock) subject;
 					if (pickedState.isPicked(vertex)) {
-//						for (BasicBlock bb: vertex.get{
-//
-//							changeVertexSizeColor(bbp,Color.blue);
-//							break;
-//						}
+						changeVertexSizeColor(vertex,Color.CYAN);
+						for (BasicBlockPath bbp: vertex.getPaths()){
+							if(bbp.equals(prev_bbp)) continue;
+							changeVertexSizeColor(bbp,Color.blue);
+							break;
+						}
 						System.out.println("Vertex " + vertex
 								+ " is now selected");
 					} else {
@@ -374,7 +377,9 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		//		}
 	}
 
+
 	public void changeVertexSizeColor(final BasicBlockPath bbp, final Color actcol){
+		
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
 				if(bbp.contains(bb.index())) {
