@@ -19,12 +19,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-
-
 
 import javax.swing.BorderFactory;
 import javax.swing.JApplet;
@@ -35,12 +31,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 import org.apache.commons.collections15.Transformer;
-import org.javadynamicanalyzer.graph.Edge;
-import org.javadynamicanalyzer.graph.Graph;
 import org.javadynamicanalyzer.BasicBlockPath;
 import org.javadynamicanalyzer.MethodNode.BasicBlock;
+import org.javadynamicanalyzer.graph.Edge;
+import org.javadynamicanalyzer.graph.Graph;
 
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraDistance;
@@ -54,7 +49,6 @@ import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
-import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 

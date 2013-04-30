@@ -159,19 +159,31 @@ public class JDAAgent implements ClassFileTransformer {
 		if(JDAtool.trackPaths){ 
 			//find the invokevirtual index of setBlockIndex
 			ConstPool cp=m.getMethodInfo().getConstPool();
-			//byte[] invokeVirtualIndex=null;
+			//cp.print();
 			int index=0;
 			boolean found=false;
 			while(found==false){
+				++index;
 				try{ 
-					String s=cp.getUtf8Info(index++);
-					if(s.equals("setBlockIndex")) found=true;
+					//String s=cp.getUtf8Info(index);
+					int id=cp.isMember("org.javadynamicanalyzer.MethodStackEntry", "setBlockIndex", index);
+					if(id!=0){
+						found=true;
+						//System.out.println("ID FOUND: "+id+" myID: "+index);
+						//index=cp.getMethodHandleIndex(id);
+						//System.out.println("ID FOUND: "+id+" myID: "+index);
+					}
+					//System.out.print(cp.getMethodrefClassName(index));
+					//System.out.println("\t"+cp.getMethodrefName(index));
+					//if(s.equals("setBlockIndex")){
+						//found=true;
+					//}
 				}
 				catch(NullPointerException | ClassCastException e){}
 			}
-			++index;
+			//++index;
 			
-			byte[] invokeVirtualIndex=new byte[]{(byte) (index<<8),(byte) (index & 0xFF)};
+			int[] invokeVirtualIndex=new int[]{index>>8, index & 0xFF};
 			
 			//INSERTED AT BASIC BLOCKS
 			int len=new ControlFlow(m).basicBlocks().length;
@@ -242,7 +254,7 @@ public class JDAAgent implements ClassFileTransformer {
 		else 
 			return new byte[]{Bytecode.ALOAD,(byte) mseStackIndex,3,(byte) 0xb6};
 	}
-	byte[] bytecodeSetBlockID(int val, int mseIndex, byte[] invokevirt){
+	byte[] bytecodeSetBlockID(int val, int mseIndex, int[] invokevirt){
 		byte[] tag=getSetBlockID0Tag(mseIndex);
 		ArrayList<Byte> out = new ArrayList<Byte>();
 		
@@ -261,8 +273,8 @@ public class JDAAgent implements ClassFileTransformer {
 			out.add((byte) (val & 0xff));
 		}
 		out.add((byte) Bytecode.INVOKEVIRTUAL); //%invoke virtual
-		out.add(invokevirt[0]);
-		out.add(invokevirt[1]);
+		out.add((byte)invokevirt[0]);
+		out.add((byte)invokevirt[1]);
 		
 		byte[] primitiveOut=new byte[out.size()];
 		for(int b=0; b<primitiveOut.length; ++b)
