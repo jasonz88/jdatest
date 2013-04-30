@@ -35,7 +35,7 @@ public class JDAtool {
 	public static void gui(){
 		for(String key : cfgMap.keySet()){
 			MethodNode mn=cfgMap.get(key);
-			mn.getVisual(mn.getName()+mn.getMeanTime());
+			mn.getVisual(mn.getName()+" Mean Time: "+mn.getMeanTime());
 		}
 	}
 }
