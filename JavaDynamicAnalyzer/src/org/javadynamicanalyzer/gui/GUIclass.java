@@ -394,6 +394,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 				return Color.RED;
 			}
 		};
+
 		//		Transformer<BasicBlock, Shape> vertexSize = new Transformer<BasicBlock, Shape>(){
 		//			public Shape transform(BasicBlock i){
 		//				Ellipse2D circle = new Ellipse2D.Double(-15, -15, 30, 30);
@@ -412,6 +413,20 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	}
 
 
+	public void changeVertexSizeColor(final BasicBlock bb, final Color actcol){
+		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
+			public Paint transform(BasicBlock b) {
+				if(bb.equals(b)) {
+
+					return actcol;
+				}
+				return Color.RED;
+			}
+		};
+
+		vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void changeVertexLabel(){
 		// this class will provide both label drawing and vertex shapes
