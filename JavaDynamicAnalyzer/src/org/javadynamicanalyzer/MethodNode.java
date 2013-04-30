@@ -26,7 +26,7 @@ public class MethodNode {
 		Block b;
 		public String toString(){ 
 			String out=Integer.toString(b.index());
-			Set<ExternalLink> outgoing=getExternalLinks(this);
+			Set<ExternalLink> outgoing=getExternalLinks();
 			if(outgoing.size()>0){
 				out+=":";
 				for(ExternalLink el : outgoing)
@@ -41,6 +41,7 @@ public class MethodNode {
 		public boolean equals(BasicBlock that){ return b==that.b; } 
 		public boolean equals(int i){ return index()==i; }
 		public boolean equals(Integer i){ return i.equals(index()); }
+		public Set<ExternalLink> getExternalLinks(){ return MethodNode.this.getExternalLinks(this); }
 		public int hashCode(){ return b.hashCode(); }
 		public MethodNode getMethodNode(){return getThis();}
 	}
