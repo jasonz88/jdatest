@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -34,12 +35,17 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.collections15.Transformer;
 import org.javadynamicanalyzer.BasicBlockPath;
 import org.javadynamicanalyzer.MethodNode.BasicBlock;
 import org.javadynamicanalyzer.graph.Edge;
 import org.javadynamicanalyzer.graph.Graph;
+import org.javadynamicanalyzer.gui.LensDemo.VerticalLabelUI;
 
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraDistance;
@@ -51,11 +57,22 @@ import edu.uci.ics.jung.visualization.VisualizationServer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.LensMagnificationGraphMousePlugin;
 import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.ModalLensGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
+import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
+import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
+import edu.uci.ics.jung.visualization.transform.HyperbolicTransformer;
+import edu.uci.ics.jung.visualization.transform.LayoutLensSupport;
+import edu.uci.ics.jung.visualization.transform.LensSupport;
+import edu.uci.ics.jung.visualization.transform.MagnifyTransformer;
+import edu.uci.ics.jung.visualization.transform.shape.HyperbolicShapeTransformer;
+import edu.uci.ics.jung.visualization.transform.shape.MagnifyShapeTransformer;
+import edu.uci.ics.jung.visualization.transform.shape.ViewLensSupport;
 
 
 @SuppressWarnings("serial")
@@ -90,6 +107,28 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	String root;
 
 	FRLayout<T,Edge<T>> layout;
+
+	/**
+	 * provides a Hyperbolic lens for the view
+	 */
+	LensSupport hyperbolicViewSupport;
+	/**
+	 * provides a magnification lens for the view
+	 */
+	LensSupport magnifyViewSupport;
+
+	/**
+	 * provides a Hyperbolic lens for the model
+	 */
+	LensSupport hyperbolicLayoutSupport;
+	/**
+	 * provides a magnification lens for the model
+	 */
+	LensSupport magnifyLayoutSupport;
+
+	BasicBlockPath AllActiveNodes;
+	
+	
 	@SuppressWarnings("unchecked")
 	//	
 	//	Mouse listeners:
@@ -214,6 +253,46 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		vv.setGraphMouse(graphMouse);
 
 
+		ButtonGroup radio = new ButtonGroup();
+		JRadioButton lineButton = new JRadioButton("Line");
+		lineButton.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<T,Edge<T>>());
+					vv.repaint();
+				}
+			}
+		});
+
+		JRadioButton quadButton = new JRadioButton("QuadCurve");
+		quadButton.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.QuadCurve<T,Edge<T>>());
+					vv.repaint();
+				}
+			}
+		});
+
+		JRadioButton cubicButton = new JRadioButton("CubicCurve");
+		cubicButton.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.CubicCurve<T,Edge<T>>());
+					vv.repaint();
+				}
+			}
+		});
+		radio.add(lineButton);
+		radio.add(quadButton);
+		radio.add(cubicButton);
+
+		JPanel edgePanel = new JPanel(new GridLayout(0,1));
+		edgePanel.setBorder(BorderFactory.createTitledBorder("EdgeType"));
+		edgePanel.add(lineButton);
+		edgePanel.add(quadButton);
+		edgePanel.add(cubicButton);
+
 		JComboBox modeBox = graphMouse.getModeComboBox();
 		modeBox.addItemListener(graphMouse.getModeListener());
 		graphMouse.setMode(ModalGraphMouse.Mode.TRANSFORMING);
@@ -233,6 +312,15 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			}
 		});
 
+		JButton reset = new JButton("reset");
+		reset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showActiveNode();
+				adjustLabel();
+				adjustLayout();
+				vv.repaint();
+			}
+		});
 
 		helpDialog = new JDialog();
 		helpDialog.getContentPane().add(new JLabel(instructions));
@@ -252,7 +340,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		controls.add(helpControls);
 		content.add(panel);
 		content.add(controls, BorderLayout.NORTH);
-
+		controls.add(edgePanel);
 
 		//        addComponentListener(new CA(this));
 
@@ -261,10 +349,143 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 		scaleGrid.add(plus);
 		scaleGrid.add(minus);
+		scaleGrid.add(reset);
 		controls.add(scaleGrid);
 		controls.add(modeBox);
 		content.add(controls, BorderLayout.SOUTH);
 
+
+
+		JSlider edgeOffsetSlider = new JSlider(0,50) {
+			public Dimension getPreferredSize() {
+				Dimension d = super.getPreferredSize();
+				d.width /= 2;
+				return d;
+			}
+		};
+		edgeOffsetSlider.addChangeListener(new ChangeListener() {
+
+			public void stateChanged(ChangeEvent e) {
+				JSlider s = (JSlider)e.getSource();
+				AbstractEdgeShapeTransformer<T, Edge<T>> aesf = 
+						(AbstractEdgeShapeTransformer<T,Edge<T>>)vv.getRenderContext().getEdgeShapeTransformer();
+				aesf.setControlOffsetIncrement(s.getValue());
+				vv.repaint();
+			}
+
+		});
+		JPanel labelPanel = new JPanel(new BorderLayout());
+		JPanel sliderPanel = new JPanel(new GridLayout(3,1));
+		JPanel sliderLabelPanel = new JPanel(new GridLayout(3,1));
+		JPanel offsetPanel = new JPanel(new BorderLayout());
+		offsetPanel.setBorder(BorderFactory.createTitledBorder("Offset"));
+
+		sliderPanel.add(edgeOffsetSlider);
+
+		sliderLabelPanel.add(new JLabel("Edges", JLabel.RIGHT));
+		offsetPanel.add(sliderLabelPanel, BorderLayout.WEST);
+		offsetPanel.add(sliderPanel);
+		labelPanel.add(offsetPanel);
+		controls.add(labelPanel);
+
+
+		hyperbolicViewSupport = 
+				new ViewLensSupport<T,Edge<T>>(vv, new HyperbolicShapeTransformer(vv, 
+						vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW)), 
+						new ModalLensGraphMouse());
+		hyperbolicLayoutSupport = 
+				new LayoutLensSupport<T,Edge<T>>(vv, new HyperbolicTransformer(vv, 
+						vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT)),
+						new ModalLensGraphMouse());
+		magnifyViewSupport = 
+				new ViewLensSupport<T,Edge<T>>(vv, new MagnifyShapeTransformer(vv,
+						vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW)),
+						new ModalLensGraphMouse(new LensMagnificationGraphMousePlugin(1.f, 6.f, .2f)));
+		magnifyLayoutSupport = 
+				new LayoutLensSupport<T,Edge<T>>(vv, new MagnifyTransformer(vv, 
+						vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT)),
+						new ModalLensGraphMouse(new LensMagnificationGraphMousePlugin(1.f, 6.f, .2f)));
+		hyperbolicLayoutSupport.getLensTransformer().setLensShape(hyperbolicViewSupport.getLensTransformer().getLensShape());
+		magnifyViewSupport.getLensTransformer().setLensShape(hyperbolicLayoutSupport.getLensTransformer().getLensShape());
+		magnifyLayoutSupport.getLensTransformer().setLensShape(magnifyViewSupport.getLensTransformer().getLensShape());
+
+
+		ButtonGroup radio1 = new ButtonGroup();
+		JRadioButton normal = new JRadioButton("None");
+		normal.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					if(hyperbolicViewSupport != null) {
+						hyperbolicViewSupport.deactivate();
+					}
+					if(hyperbolicLayoutSupport != null) {
+						hyperbolicLayoutSupport.deactivate();
+					}
+					if(magnifyViewSupport != null) {
+						magnifyViewSupport.deactivate();
+					}
+					if(magnifyLayoutSupport != null) {
+						magnifyLayoutSupport.deactivate();
+					}
+				}
+			}
+		});
+
+		final JRadioButton hyperView = new JRadioButton("Hyperbolic View");
+		hyperView.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				hyperbolicViewSupport.activate(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+		final JRadioButton hyperModel = new JRadioButton("Hyperbolic Layout");
+		hyperModel.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				hyperbolicLayoutSupport.activate(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+		final JRadioButton magnifyView = new JRadioButton("Magnified View");
+		magnifyView.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				magnifyViewSupport.activate(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+		final JRadioButton magnifyModel = new JRadioButton("Magnified Layout");
+		magnifyModel.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				magnifyLayoutSupport.activate(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
+		JLabel modeLabel = new JLabel("     Mode Menu >>");
+		modeLabel.setUI(new VerticalLabelUI(false));
+		radio1.add(normal);
+		radio1.add(hyperModel);
+		radio1.add(hyperView);
+		radio1.add(magnifyModel);
+		radio1.add(magnifyView);
+		normal.setSelected(true);
+
+		graphMouse.addItemListener(hyperbolicLayoutSupport.getGraphMouse().getModeListener());
+		graphMouse.addItemListener(hyperbolicViewSupport.getGraphMouse().getModeListener());
+		graphMouse.addItemListener(magnifyLayoutSupport.getGraphMouse().getModeListener());
+		graphMouse.addItemListener(magnifyViewSupport.getGraphMouse().getModeListener());
+
+		JPanel hyperControls = new JPanel(new GridLayout(3,2));
+		hyperControls.setBorder(BorderFactory.createTitledBorder("Examiner Lens"));
+
+		hyperControls.add(normal);
+		hyperControls.add(new JLabel());
+
+		hyperControls.add(hyperModel);
+		hyperControls.add(magnifyModel);
+
+		hyperControls.add(hyperView);
+		hyperControls.add(magnifyView);
+
+		controls.add(hyperControls);
+
+		AllActiveNodes=new BasicBlockPath();
+		for (BasicBlockPath bbp: ((BasicBlock) graph.getVertices().iterator().next()).getMethodNode().getPaths())
+			AllActiveNodes.addAll(bbp);
 
 		showActiveNode();
 		adjustLabel();
@@ -276,27 +497,23 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-
-
 				Object subject = e.getItem();
 				if (subject instanceof BasicBlock) {
 					System.out.println("asdfsadf");
-
 					showActiveNode();
 					BasicBlock vertex = (BasicBlock) subject;
 					if (pickedState.isPicked(vertex)) {
-
-
-
-						changeVertexSizeColor(vertex,Color.CYAN);
 						for (BasicBlockPath bbp: vertex.getPaths()){
 							if(bbp.equals(prev_bbp)) continue;
-							changeVertexSizeColor(bbp,Color.blue);
+							changePathColor(bbp,Color.blue, AllActiveNodes, Color.green);
+							prev_bbp=bbp;
 							break;
 						}
+						//changeVertexColor(vertex, Color.CYAN, AllActiveNodes, Color.green);
 						System.out.println("Vertex " + vertex
 								+ " is now selected");
 					} else {
+						showActiveNode();
 						System.out.println("Vertex " + vertex
 								+ " no longer selected");
 					}
@@ -357,21 +574,21 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		}
 	}
 
-//	public double adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){	
-//		double rv=0;
-//		if (curLevel.isEmpty())	return depth;
-//		double newdepth=depth;
-//		for (T t: curLevel){
-//			if (visited.contains(t)) continue;
-//			visited.add(t);
-//			Point2D v=layout.transform(t);
-//			v.setLocation(width,depth);
-//			rv=adjustLayoutNeib(getSortedSuccessors(t),depth+50, width, visited);
-//			newdepth=(rv>newdepth)? rv: newdepth;
-//			width+=50*graph.getSuccessorCount(t);	
-//		}
-//		return newdepth;
-//	}
+	//	public double adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){	
+	//		double rv=0;
+	//		if (curLevel.isEmpty())	return depth;
+	//		double newdepth=depth;
+	//		for (T t: curLevel){
+	//			if (visited.contains(t)) continue;
+	//			visited.add(t);
+	//			Point2D v=layout.transform(t);
+	//			v.setLocation(width,depth);
+	//			rv=adjustLayoutNeib(getSortedSuccessors(t),depth+50, width, visited);
+	//			newdepth=(rv>newdepth)? rv: newdepth;
+	//			width+=50*graph.getSuccessorCount(t);	
+	//		}
+	//		return newdepth;
+	//	}
 
 
 	public double[] adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){	
@@ -396,14 +613,26 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	}
 
 	
+
 	public void showActiveNode(){
-		BasicBlockPath col=new BasicBlockPath();
-		for (BasicBlockPath bbp: ((BasicBlock) graph.getVertices().iterator().next()).getMethodNode().getPaths())
-			col.addAll(bbp);
-		changeVertexSizeColor(col,Color.green);
+		
+		changePathColor(AllActiveNodes,Color.green);
 	}
 
 
+	private void changePathColor(final BasicBlockPath bbp, final Color actcol) {
+		// TODO Auto-generated method stub
+		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
+			public Paint transform(BasicBlock bb) {
+				if(bbp.contains(bb.index())) {
+					return actcol;
+				}
+				return Color.RED;
+			}
+		};
+		vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
+	}
+	
 	public void adjustLabel(){
 		//		for(T t: graph.getVertices()){
 		//			if (t instanceof BasicBlock){
@@ -427,14 +656,22 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	}
 
 
-	public void changeVertexSizeColor(final BasicBlockPath bbp, final Color actcol){
+	public void changePathColor(final BasicBlockPath curpath, final Color pathcol, final BasicBlockPath bbp, final Color actcol ){
 
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
-				if(bbp.contains(bb.index())) {
-					return actcol;
+				if(curpath.contains(bb.index())) {
+					return pathcol;
 				}
-				return Color.RED;
+				Transformer<BasicBlock, Paint> othervertexColor = new Transformer<BasicBlock, Paint>() {
+					public Paint transform(BasicBlock bb) {
+						if(bbp.contains(bb.index())) {
+							return actcol;
+						}
+						return Color.RED;
+					}
+				};
+				return othervertexColor.transform(bb);
 			}
 		};
 
@@ -456,14 +693,21 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	}
 
 
-	public void changeVertexSizeColor(final BasicBlock bb, final Color actcol){
+	public void changeVertexColor(final BasicBlock bb, final Color curnodecol, final BasicBlockPath bbp, final Color actcol){
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock b) {
 				if(bb.equals(b)) {
-
-					return actcol;
+					return curnodecol;
 				}
-				return Color.RED;
+				Transformer<BasicBlock, Paint> othervertexColor = new Transformer<BasicBlock, Paint>() {
+					public Paint transform(BasicBlock bb) {
+						if(bbp.contains(bb.index())) {
+							return actcol;
+						}
+						return Color.RED;
+					}
+				};
+				return othervertexColor.transform(bb);	
 			}
 		};
 
