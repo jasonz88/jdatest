@@ -1,5 +1,6 @@
 package org.javadynamicanalyzer.gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -7,10 +8,9 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -18,6 +18,11 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +30,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -34,11 +40,18 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import org.apache.commons.collections15.Transformer;
 import org.javadynamicanalyzer.BasicBlockPath;
@@ -64,6 +77,7 @@ import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.renderers.VertexLabelAsShapeRenderer;
 import edu.uci.ics.jung.visualization.transform.HyperbolicTransformer;
@@ -74,6 +88,10 @@ import edu.uci.ics.jung.visualization.transform.shape.HyperbolicShapeTransformer
 import edu.uci.ics.jung.visualization.transform.shape.MagnifyShapeTransformer;
 import edu.uci.ics.jung.visualization.transform.shape.ViewLensSupport;
 
+
+import org.javadynamicanalyzer.gui.TextAreaOutputStream;
+
+import EDU.oswego.cs.dl.util.concurrent.misc.SwingWorker;
 
 @SuppressWarnings("serial")
 public class GUIclass<T> extends JApplet implements Iterable<T> {
@@ -128,7 +146,9 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 	BasicBlockPath AllActiveNodes;
 	
-	
+	VertexStrokeHighlight<T> vsh;
+
+
 	@SuppressWarnings("unchecked")
 	//	
 	//	Mouse listeners:
@@ -173,13 +193,57 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 	JDialog helpDialog;
 
-	static BasicBlockPath prev_bbp;
+	Set<BasicBlockPath> prev_bbp;
 
 	@SuppressWarnings("unchecked")
+
+	JTextPane textPane=new JTextPane();
+
+	private void updateTextPane(final String text) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				Document doc = textPane.getDocument();
+				try {
+					doc.insertString(doc.getLength(), text, null);
+				} catch (BadLocationException e) {
+					throw new RuntimeException(e);
+				}
+				textPane.setCaretPosition(doc.getLength() - 1);
+			}
+		});
+	}
+
+	private void redirectSystemStreams() {
+		OutputStream out = new OutputStream() {
+			@Override
+			public void write(final int b) throws IOException {
+				updateTextPane(String.valueOf((char) b));
+			}
+
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				updateTextPane(new String(b, off, len));
+			}
+
+			@Override
+			public void write(byte[] b) throws IOException {
+				write(b, 0, b.length);
+			}
+		};
+
+		System.setOut(new PrintStream(out, true));
+		System.setErr(new PrintStream(out, true));
+	}
+
+
+
 
 
 	public void getVisual(String name){
 
+		JFrame frame = new JFrame(name);
+		
+		
 		layout = new FRLayout<T, Edge<T>>(graph);
 		//		adjustLayout();
 
@@ -190,6 +254,34 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
 		//		add a listener for ToolTips
 		vv.setVertexToolTipTransformer(new ToStringLabeller());
+		
+		
+		redirectSystemStreams();
+		
+		prev_bbp=new HashSet<BasicBlockPath>();
+		final PickedState<T> picked_state = vv.getPickedVertexState();
+		vsh = new VertexStrokeHighlight<T>(picked_state);
+		frame.add( new JLabel(name), BorderLayout.NORTH );
+		System.out.println(graph.toString());
+
+		//		frame.add( new JLabel(" Outout" ), BorderLayout.NORTH );
+		//
+		//        JTextArea ta = new JTextArea(10,20);
+		//        ta.append("Hello world!");
+		//        frame.add( new JScrollPane( ta )  );
+		//        TextAreaOutputStream taos = new TextAreaOutputStream(ta);
+		//        PrintStream ps = new PrintStream( taos );
+		//        System.setOut( ps );
+		//        System.setErr( ps );
+		//
+		//
+		//        frame.add( ta   );
+		//        frame.pack();
+		//        frame.setVisible( true );
+		//        for( int i = 0 ; i < 100 ; i++ ) {
+		//            System.out.println( i );
+		//        }
+		
 		//		vv.getRenderContext().setArrowFillPaintTransformer(new EdgeShape.QuadCurve<T, Edge<T>>());
 
 		//        vv.setBackground(Color.black);
@@ -199,7 +291,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		content.add(panel);
 
 
-		final PickedState<BasicBlock> pickedState = (PickedState<BasicBlock>) vv.getPickedVertexState();
 		//		final DefaultModalGraphMouse graphMouse = new DefaultModalGraphMouse();
 		final DefaultModalGraphMouse graphMouse = new DefaultModalGraphMouse(){
 
@@ -389,6 +480,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		controls.add(labelPanel);
 
 
+
+
 		hyperbolicViewSupport = 
 				new ViewLensSupport<T,Edge<T>>(vv, new HyperbolicShapeTransformer(vv, 
 						vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW)), 
@@ -492,8 +585,19 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 		adjustLayout();
 
+
+
+		JScrollPane paneScrollPane = new JScrollPane(textPane);
+		paneScrollPane.setVerticalScrollBarPolicy(
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		paneScrollPane.setPreferredSize(new Dimension(250, 155));
+		paneScrollPane.setMinimumSize(new Dimension(10, 10));
+
+
+		controls.add(paneScrollPane);
+
 		// Attach the listener that will print when the vertices selection changes.
-		pickedState.addItemListener(new ItemListener(){
+		picked_state.addItemListener(new ItemListener(){
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -502,18 +606,21 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 					System.out.println("asdfsadf");
 					showActiveNode();
 					BasicBlock vertex = (BasicBlock) subject;
-					if (pickedState.isPicked(vertex)) {
+					if (picked_state.isPicked((T) vertex)) {
 						for (BasicBlockPath bbp: vertex.getPaths()){
-							if(bbp.equals(prev_bbp)) continue;
+							if(prev_bbp.contains(bbp) && vertex.getPaths().size()!=1) continue;
 							changePathColor(bbp,Color.blue, AllActiveNodes, Color.green);
-							prev_bbp=bbp;
+							prev_bbp.add(bbp);
+							if(prev_bbp.size()==vertex.getPaths().size()) prev_bbp.clear();
 							break;
 						}
-						//changeVertexColor(vertex, Color.CYAN, AllActiveNodes, Color.green);
+						//						JOptionPane.showMessageDialog(null, "put stats here", "InfoBox: ", JOptionPane.INFORMATION_MESSAGE);
+						//						JOptionPane.showInputDialog(null, "asdfa", "info", JOptionPane.INFORMATION_MESSAGE );
+						//						changeVertexColor(vertex, Color.CYAN, AllActiveNodes, Color.green);
 						System.out.println("Vertex " + vertex
 								+ " is now selected");
 					} else {
-						showActiveNode();
+						//						showActiveNode();
 						System.out.println("Vertex " + vertex
 								+ " no longer selected");
 					}
@@ -524,7 +631,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 
 
-		JFrame frame = new JFrame(name);
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(this);
 		frame.pack();
@@ -612,10 +719,10 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		return rv;
 	}
 
-	
+
 
 	public void showActiveNode(){
-		
+
 		changePathColor(AllActiveNodes,Color.green);
 	}
 
@@ -632,7 +739,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		};
 		vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
 	}
-	
+
 	public void adjustLabel(){
 		//		for(T t: graph.getVertices()){
 		//			if (t instanceof BasicBlock){
@@ -660,18 +767,9 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
-				if(curpath.contains(bb.index())) {
-					return pathcol;
-				}
-				Transformer<BasicBlock, Paint> othervertexColor = new Transformer<BasicBlock, Paint>() {
-					public Paint transform(BasicBlock bb) {
-						if(bbp.contains(bb.index())) {
-							return actcol;
-						}
-						return Color.RED;
-					}
-				};
-				return othervertexColor.transform(bb);
+				if(curpath.contains(bb.index())) 	return pathcol;
+				else if(bbp.contains(bb.index())) 	return actcol;
+				else 		return Color.RED;
 			}
 		};
 
@@ -696,18 +794,9 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	public void changeVertexColor(final BasicBlock bb, final Color curnodecol, final BasicBlockPath bbp, final Color actcol){
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock b) {
-				if(bb.equals(b)) {
-					return curnodecol;
-				}
-				Transformer<BasicBlock, Paint> othervertexColor = new Transformer<BasicBlock, Paint>() {
-					public Paint transform(BasicBlock bb) {
-						if(bbp.contains(bb.index())) {
-							return actcol;
-						}
-						return Color.RED;
-					}
-				};
-				return othervertexColor.transform(bb);	
+				if(bb.equals(b)) 	return curnodecol;
+				else if(bbp.contains(bb.index()))	return actcol;
+				else		return Color.RED;
 			}
 		};
 
@@ -764,11 +853,41 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	}
 
 
-	@SuppressWarnings("unchecked")
-	public void Highlight(VisualizationViewer<T, Edge<T>> vv, final Integer bb){
+	private class VertexStrokeHighlight<T> implements
+    Transformer<T,Stroke>
+    {
+        protected boolean highlight = false;
+        protected Stroke heavy = new BasicStroke(5);
+        protected Stroke medium = new BasicStroke(3);
+        protected Stroke light = new BasicStroke(1);
+        protected PickedInfo<T> pi;
+        
+        public VertexStrokeHighlight(PickedInfo<T> pi)
+        {
+            this.pi = pi;
+        }
+        
+        public void setHighlight(boolean highlight)
+        {
+            this.highlight = highlight;
+        }
+        
+        public Stroke transform(T v)
+        {
+            if (highlight)
+            {
+                if (pi.isPicked(v))
+                    return heavy;
+                else
+                {
+                    return light;
+                }
+            }
+            else
+                return light; 
+        }
 
-
-	}
+    }
 
 
 
