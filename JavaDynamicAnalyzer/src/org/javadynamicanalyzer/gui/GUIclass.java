@@ -18,9 +18,13 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JApplet;
@@ -37,7 +41,7 @@ import org.javadynamicanalyzer.MethodNode.BasicBlock;
 import org.javadynamicanalyzer.graph.Edge;
 import org.javadynamicanalyzer.graph.Graph;
 
-import edu.uci.ics.jung.algorithms.layout.KKLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraDistance;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -85,7 +89,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 	String root;
 
-	KKLayout<T,Edge<T>> layout;
+	FRLayout<T,Edge<T>> layout;
 	@SuppressWarnings("unchecked")
 	//	
 	//	Mouse listeners:
@@ -131,13 +135,14 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	JDialog helpDialog;
 
 	static BasicBlockPath prev_bbp;
-	
+
 	@SuppressWarnings("unchecked")
 
 
 	public void getVisual(String name){
 
-		layout = new KKLayout<T, Edge<T>>(graph);
+		layout = new FRLayout<T, Edge<T>>(graph);
+		//		adjustLayout();
 
 
 		vv =  new VisualizationViewer<T, Edge<T>>(layout, new Dimension(600,600));
@@ -260,24 +265,29 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		controls.add(modeBox);
 		content.add(controls, BorderLayout.SOUTH);
 
-		adjustLayout();
+
 		showActiveNode();
 		adjustLabel();
 
-		
+		adjustLayout();
 
 		// Attach the listener that will print when the vertices selection changes.
 		pickedState.addItemListener(new ItemListener(){
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				showActiveNode();
+
+
 				Object subject = e.getItem();
 				if (subject instanceof BasicBlock) {
 					System.out.println("asdfsadf");
 
+					showActiveNode();
 					BasicBlock vertex = (BasicBlock) subject;
 					if (pickedState.isPicked(vertex)) {
+
+
+
 						changeVertexSizeColor(vertex,Color.CYAN);
 						for (BasicBlockPath bbp: vertex.getPaths()){
 							if(bbp.equals(prev_bbp)) continue;
@@ -308,15 +318,32 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 	public DijkstraDistance<T,Edge<T>> getDijkstraDistance(){ return new DijkstraDistance<T,Edge<T>>(graph); }
 
+	public Collection<T> getSortedSuccessors(T t){
+		Collection<T> vertices = graph.getSuccessors(t);
+		List<T> vertlist = new ArrayList<T>();
+		for (T v : vertices)
+			vertlist.add(v);
+		Comparator comparator = new Comparator<BasicBlock>() {
+			public int compare(BasicBlock c1, BasicBlock c2) {
+				return c1.index() - c2.index(); // use your logic
+			}
+		};
+
+		Collections.sort(vertlist, comparator);
+		return vertlist;
+	}
+
+	@SuppressWarnings("unchecked")
 	public void adjustLayout(){
-		double depth=0;
+		double[] rv=new double[2];
 		Collection<T> visited=new HashSet<T>();
+
 		for(T t: graph.getVertices()){
 			if(graph.getInEdges(t).size()==0){
 				visited.add(t);
 				Point2D v=layout.transform(t);
 				v.setLocation(300,10);
-				depth=adjustLayoutNeib(graph.getSuccessors(t),60, 300, visited);
+				rv=adjustLayoutNeib(getSortedSuccessors(t),60,300, visited);
 				break;
 			}
 		}
@@ -324,29 +351,51 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		for(T t: graph.getVertices()){
 			if(graph.getOutEdges(t).size()==0){
 				Point2D v=layout.transform(t);
-				v.setLocation(xax,depth+50);
+				v.setLocation(xax,rv[1]+50);
 				xax+=50;
 			}
 		}
 	}
 
-	public double adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){
-		if (curLevel.isEmpty()) return depth;
-		double newdepth=0;
-		double rv=0;
+//	public double adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){	
+//		double rv=0;
+//		if (curLevel.isEmpty())	return depth;
+//		double newdepth=depth;
+//		for (T t: curLevel){
+//			if (visited.contains(t)) continue;
+//			visited.add(t);
+//			Point2D v=layout.transform(t);
+//			v.setLocation(width,depth);
+//			rv=adjustLayoutNeib(getSortedSuccessors(t),depth+50, width, visited);
+//			newdepth=(rv>newdepth)? rv: newdepth;
+//			width+=50*graph.getSuccessorCount(t);	
+//		}
+//		return newdepth;
+//	}
+
+
+	public double[] adjustLayoutNeib(Collection<T> curLevel, double depth, double width, Collection<T> visited){	
+		double[] rv= new double[2];
+		rv[0]=0;rv[1]=depth;
+		if (curLevel.isEmpty())	return rv;
+		double newdepth=depth;
+		double succount=0;
 		for (T t: curLevel){
 			if (visited.contains(t)) continue;
 			visited.add(t);
 			Point2D v=layout.transform(t);
-			v.setLocation(width, depth);
-			rv=adjustLayoutNeib(graph.getSuccessors(t),depth+50, width, visited);
-			newdepth=rv>newdepth? rv: newdepth;
-			width+=50;
+			v.setLocation(width,depth);
+			rv=adjustLayoutNeib(getSortedSuccessors(t),depth+50, width, visited);
+			newdepth=(rv[1]>newdepth)? rv[1]: newdepth;
+			width+=50*(graph.getSuccessorCount(t)+rv[0]);
+			succount+=graph.getSuccessorCount(t)-1;
 		}
-		return newdepth;
+		rv[0]=curLevel.size()==1?0:succount;
+		rv[1]=newdepth;
+		return rv;
 	}
 
-
+	
 	public void showActiveNode(){
 		BasicBlockPath col=new BasicBlockPath();
 		for (BasicBlockPath bbp: ((BasicBlock) graph.getVertices().iterator().next()).getMethodNode().getPaths())
@@ -379,7 +428,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 
 	public void changeVertexSizeColor(final BasicBlockPath bbp, final Color actcol){
-		
+
 		Transformer<BasicBlock, Paint> vertexColor = new Transformer<BasicBlock, Paint>() {
 			public Paint transform(BasicBlock bb) {
 				if(bbp.contains(bb.index())) {
@@ -420,7 +469,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 
 		vv.getRenderContext().setVertexFillPaintTransformer((Transformer<T, Paint>) vertexColor);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void changeVertexLabel(){
 		// this class will provide both label drawing and vertex shapes
@@ -486,20 +535,22 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			return super.toString();
 	}
 
-	class CA extends ComponentAdapter{
-		GUIclass<T> gui;
-		public CA(GUIclass<T> g){ gui=g; }
-		public void componentResized(ComponentEvent e){
-			gui.vv.setGraphLayout(new KKLayout<T, Edge<T>>(graph));
-			Point2D lvc=gui.vv.getRenderContext().getMultiLayerTransformer().inverseTransform(gui.vv.getCenter());
-			Dimension d=e.getComponent().getSize();
-			final double dx = lvc.getX()-d.getWidth()/2;
-			final double dy = lvc.getY()-d.getHeight()/2;
-			gui.vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).translate(dx, dy+50);
 
+	//	class CA extends ComponentAdapter{
+	//		GUIclass<T> gui;
+	//		public CA(GUIclass<T> g){ gui=g; }
+	//		public void componentResized(ComponentEvent e){
+	//			gui.vv.setGraphLayout(new FRLayout<T, Edge<T>>(graph));
+	//			Point2D lvc=gui.vv.getRenderContext().getMultiLayerTransformer().inverseTransform(gui.vv.getCenter());
+	//			Dimension d=e.getComponent().getSize();
+	//			final double dx = lvc.getX()-d.getWidth()/2;
+	//			final double dy = lvc.getY()-d.getHeight()/2;
+	//			gui.vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).translate(dx, dy+50);
+	//
+	//
+	//
+	//
+	//		}
+	//	}
 
-
-
-		}
-	}
 }
