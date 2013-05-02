@@ -15,6 +15,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -27,15 +29,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -53,7 +59,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.apache.commons.collections15.Predicate;
 import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.functors.MapTransformer;
 import org.javadynamicanalyzer.BasicBlockPath;
 import org.javadynamicanalyzer.MethodNode.BasicBlock;
 import org.javadynamicanalyzer.graph.Edge;
@@ -63,9 +71,11 @@ import org.javadynamicanalyzer.gui.LensDemo.VerticalLabelUI;
 import edu.uci.ics.jung.algorithms.layout.FRLayout;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraDistance;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.util.Context;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
 import edu.uci.ics.jung.visualization.Layer;
+import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.VisualizationServer;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
@@ -76,6 +86,7 @@ import edu.uci.ics.jung.visualization.control.ModalLensGraphMouse;
 import edu.uci.ics.jung.visualization.control.ScalingControl;
 import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
+import edu.uci.ics.jung.visualization.decorators.NumberFormattingTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import edu.uci.ics.jung.visualization.picking.PickedState;
@@ -147,7 +158,20 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	BasicBlockPath AllActiveNodes;
 	
 	VertexStrokeHighlight<T> vsh;
+	
+	EdgeWeightStrokeFunction<T> ewcs;
 
+	Transformer<Edge<T>,String> es;
+	
+	Map<Edge<T>, Long> edge_weight;
+	
+	Map<T, Long> node_weight;
+	
+	JCheckBox v_small;
+	
+	VertexDisplayPredicate<T> show_vertex;
+	
+	long min_ac;
 
 	@SuppressWarnings("unchecked")
 	//	
@@ -236,7 +260,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 	}
 
 
-
+     
+	
 
 
 	public void getVisual(String name){
@@ -255,14 +280,72 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		//		add a listener for ToolTips
 		vv.setVertexToolTipTransformer(new ToStringLabeller());
 		
-		
 		redirectSystemStreams();
+		
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowActivated(WindowEvent e) {
+				redirectSystemStreams();
+        }});
+		
+		
+		
+		edge_weight = new HashMap<Edge<T>, Long>();
+		
+		BasicBlock bbb= (BasicBlock)graph.getVertices().iterator().next();
+		
+		for(Edge<T> e: graph.getEdges()){
+			long noInAllPath=0;
+			for (BasicBlockPath bbp: bbb.getMethodNode().getPaths()){
+				long noInPath=0;
+				for (int i=1;i<bbp.size();++i){
+//					System.out.println(e.src+"->"+e.dst);
+//					System.out.println("bb: "+bbp.get(i-1)+"->"+bbp.get(i));
+					BasicBlock esrc= (BasicBlock)e.src;
+					BasicBlock edst= (BasicBlock)e.dst;
+					if(esrc.index()==bbp.get(i-1) && edst.index()==bbp.get(i)){
+//						System.out.println("I am here");
+						noInPath++;
+					}
+				}
+				noInAllPath+=noInPath*bbp.getTotalTime();
+				 
+			}
+			 edge_weight.put(e,noInAllPath);
+			
+		}
+		
+		node_weight= new HashMap<T,Long>();
+		for(T v: graph.getVertices()){
+			long noOfNode=0;
+			for (Edge<T> e: graph.getOutEdges(v)){
+				noOfNode+=edge_weight.get(e);
+			}
+			node_weight.put(v, noOfNode);
+		}
+		
+		
+		ewcs = new EdgeWeightStrokeFunction<T>( edge_weight);
+		show_vertex = new VertexDisplayPredicate<T>(false);
+		
+		es = new NumberFormattingTransformer<Edge<T>>( MapTransformer.getInstance(edge_weight));
+		vv.getRenderContext().setEdgeLabelTransformer(es);
+		vv.getRenderContext().setEdgeStrokeTransformer(ewcs);
+		vv.getRenderContext().setVertexIncludePredicate(show_vertex);
+		
+		
+		
+		
 		
 		prev_bbp=new HashSet<BasicBlockPath>();
 		final PickedState<T> picked_state = vv.getPickedVertexState();
 		vsh = new VertexStrokeHighlight<T>(picked_state);
-		frame.add( new JLabel(name), BorderLayout.NORTH );
+		vsh.setHighlight(true);
+		vv.getRenderContext().setVertexStrokeTransformer(vsh);
+		final JLabel topLabel=new JLabel(name);
+		frame.add( topLabel, BorderLayout.NORTH );
 		System.out.println(graph.toString());
+		
+		
 
 		//		frame.add( new JLabel(" Outout" ), BorderLayout.NORTH );
 		//
@@ -410,6 +493,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 				adjustLabel();
 				adjustLayout();
 				vv.repaint();
+				vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).setToIdentity();
+				vv.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.VIEW).setToIdentity();
 			}
 		});
 
@@ -443,6 +528,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		scaleGrid.add(reset);
 		controls.add(scaleGrid);
 		controls.add(modeBox);
+		
 		content.add(controls, BorderLayout.SOUTH);
 
 
@@ -594,7 +680,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		paneScrollPane.setMinimumSize(new Dimension(10, 10));
 
 
-		controls.add(paneScrollPane);
+		frame.add(paneScrollPane,BorderLayout.EAST);
 
 		// Attach the listener that will print when the vertices selection changes.
 		picked_state.addItemListener(new ItemListener(){
@@ -603,35 +689,58 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			public void itemStateChanged(ItemEvent e) {
 				Object subject = e.getItem();
 				if (subject instanceof BasicBlock) {
-					System.out.println("asdfsadf");
+					
 					showActiveNode();
 					BasicBlock vertex = (BasicBlock) subject;
+					
 					if (picked_state.isPicked((T) vertex)) {
 						for (BasicBlockPath bbp: vertex.getPaths()){
 							if(prev_bbp.contains(bbp) && vertex.getPaths().size()!=1) continue;
-							changePathColor(bbp,Color.blue, AllActiveNodes, Color.green);
+							changePathColor(bbp,Color.orange, AllActiveNodes, Color.green);
+							System.out.println("path total time: "+ bbp.getTotalTime());
+							System.out.println("path mean time: "+ bbp.getMeanTime());
+							System.out.println("path traversal: "+ bbp.getTraversals());
 							prev_bbp.add(bbp);
 							if(prev_bbp.size()==vertex.getPaths().size()) prev_bbp.clear();
 							break;
 						}
+						
 						//						JOptionPane.showMessageDialog(null, "put stats here", "InfoBox: ", JOptionPane.INFORMATION_MESSAGE);
 						//						JOptionPane.showInputDialog(null, "asdfa", "info", JOptionPane.INFORMATION_MESSAGE );
 						//						changeVertexColor(vertex, Color.CYAN, AllActiveNodes, Color.green);
 						System.out.println("Vertex " + vertex
 								+ " is now selected");
+						System.out.println("basic block contains:\n"+vertex.toString());
+						System.out.println("number of execution:\n"+node_weight.get(vertex));
 					} else {
 						//						showActiveNode();
 						System.out.println("Vertex " + vertex
 								+ " no longer selected");
 					}
 				}
-				System.out.println("lalal");
 			}
 		});
 
+		v_small = new JCheckBox("filter when execution <= threshold ");
+		v_small.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				AbstractButton source = (AbstractButton)e.getSource();
+				if(source.isSelected()){
+					String rv=JOptionPane.showInputDialog(null, "Please input threshold: ", "info", JOptionPane.INFORMATION_MESSAGE );
+					if(rv==null) return;
+					else min_ac=Long.parseLong(rv);
+				}
+				show_vertex.filterSmall(source.isSelected());
+				
+				topLabel.setText("filter when execution <= " + min_ac);
+				
+				vv.repaint();
+			}});
+			
 
-
-
+		controls.add(v_small);
+		
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(this);
 		frame.pack();
@@ -663,17 +772,17 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		Collection<T> visited=new HashSet<T>();
 
 		for(T t: graph.getVertices()){
-			if(graph.getInEdges(t).size()==0){
+			if(graph.inDegree(t)==0){
 				visited.add(t);
 				Point2D v=layout.transform(t);
-				v.setLocation(300,10);
-				rv=adjustLayoutNeib(getSortedSuccessors(t),60,300, visited);
+				v.setLocation(300,60);
+				rv=adjustLayoutNeib(getSortedSuccessors(t),120,300, visited);
 				break;
 			}
 		}
 		double xax=300;
 		for(T t: graph.getVertices()){
-			if(graph.getOutEdges(t).size()==0){
+			if(graph.outDegree(t)==0){
 				Point2D v=layout.transform(t);
 				v.setLocation(xax,rv[1]+50);
 				xax+=50;
@@ -813,8 +922,8 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			@Override
 			public String transform(BasicBlock bb) {
 				// TODO Auto-generated method stub
-				if(bb.getExternalLinks().isEmpty()) return "<html><center>"+bb.index()+"<p>";
-				return bb.toString();
+				if(bb.getExternalLinks().isEmpty()) return bb.toString();
+				return "<html><center>"+bb.index()+"<p>";
 			}});
 		vv.getRenderContext().setVertexShapeTransformer((Transformer<T, Shape>) new Transformer<BasicBlock, Shape>(){
 
@@ -890,6 +999,81 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
     }
 
 
+	 private class EdgeWeightStrokeFunction<T>
+	    implements Transformer<Edge<T>,Stroke>
+	    {
+	        protected final Stroke basic = new BasicStroke(1);
+	        protected final Stroke heavy = new BasicStroke(2);
+	        protected final Stroke dotted = RenderContext.DOTTED;
+	        
+	        protected boolean weighted = false;
+	        protected Map<Edge<T>,Long> edge_weight_l;
+	        
+	        public EdgeWeightStrokeFunction(Map<Edge<T>,Long> edge_weight)
+	        {
+	            this.edge_weight_l = edge_weight;
+	        }
+	        
+	        public void setWeighted(boolean weighted)
+	        {
+	            this.weighted = weighted;
+	        }
+	        
+	        public Stroke transform(Edge<T> e)
+	        {
+	            if (weighted)
+	            {
+	                if (drawHeavy(e))
+	                    return heavy;
+	                else
+	                    return dotted;
+	            }
+	            else
+	                return basic;
+	        }
+	        
+	        protected boolean drawHeavy(Edge<T> e)
+	        {
+	            double value = edge_weight_l.get(e).doubleValue();
+	            if (value > 0.7)
+	                return true;
+	            else
+	                return false;
+	        }
+	        
+	    }
+	 
+	 private class VertexDisplayPredicate<T>
+ 	implements 
+// 	extends  AbstractGraphPredicate<V,E>
+Predicate<Context<edu.uci.ics.jung.graph.Graph<T, Edge<T>>, T>>
+ {
+     protected boolean filter_inac;
+     
+     public VertexDisplayPredicate(boolean filter)
+     {
+         this.filter_inac = filter;
+     }
+     
+     public void filterSmall(boolean b)
+     {
+         filter_inac = b;
+     }
+
+
+	@Override
+	public boolean evaluate(
+			Context<edu.uci.ics.jung.graph.Graph<T, Edge<T>>, T> context) {
+		edu.uci.ics.jung.graph.Graph<T, Edge<T>> graph = context.graph;
+    	T v = context.element;
+//        Vertex v = (Vertex)arg0;
+        if (filter_inac)
+            return (node_weight.get(v) > min_ac || graph.outDegree(v)==0);
+        else
+            return true;
+    }
+	
+ }
 
 	public String toString(){
 		if(name!=null)
