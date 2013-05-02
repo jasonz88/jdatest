@@ -315,6 +315,7 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			node_weight.put(v, noOfNode);
 		}
 		
+		
 		ewcs = new EdgeWeightStrokeFunction<T>( edge_weight);
 		show_vertex = new VertexDisplayPredicate<T>(false);
 		
@@ -322,6 +323,10 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		vv.getRenderContext().setEdgeLabelTransformer(es);
 		vv.getRenderContext().setEdgeStrokeTransformer(ewcs);
 		vv.getRenderContext().setVertexIncludePredicate(show_vertex);
+		
+		
+		
+		
 		
 		prev_bbp=new HashSet<BasicBlockPath>();
 		final PickedState<T> picked_state = vv.getPickedVertexState();
@@ -367,6 +372,10 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseClicked(e);
+				//				
+				//
+
+
 			}
 
 			public void mouseEntered(MouseEvent arg0) {
