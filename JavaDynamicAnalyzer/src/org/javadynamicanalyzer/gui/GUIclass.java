@@ -21,10 +21,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -98,11 +95,6 @@ import edu.uci.ics.jung.visualization.transform.MagnifyTransformer;
 import edu.uci.ics.jung.visualization.transform.shape.HyperbolicShapeTransformer;
 import edu.uci.ics.jung.visualization.transform.shape.MagnifyShapeTransformer;
 import edu.uci.ics.jung.visualization.transform.shape.ViewLensSupport;
-
-
-import org.javadynamicanalyzer.gui.TextAreaOutputStream;
-
-import EDU.oswego.cs.dl.util.concurrent.misc.SwingWorker;
 
 @SuppressWarnings("serial")
 public class GUIclass<T> extends JApplet implements Iterable<T> {
@@ -693,13 +685,14 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 					showActiveNode();
 					BasicBlock vertex = (BasicBlock) subject;
 					
+					System.out.println();
 					if (picked_state.isPicked((T) vertex)) {
 						for (BasicBlockPath bbp: vertex.getPaths()){
 							if(prev_bbp.contains(bbp) && vertex.getPaths().size()!=1) continue;
 							changePathColor(bbp,Color.orange, AllActiveNodes, Color.green);
-							System.out.println("path total time: "+ bbp.getTotalTime());
-							System.out.println("path mean time: "+ bbp.getMeanTime());
-							System.out.println("path traversal: "+ bbp.getTraversals());
+							//System.out.println("path total time: "+ bbp.getTotalTime());
+							System.out.println("Path mean time: "+ bbp.getMeanTime());
+							System.out.println("Path traversal: "+ bbp.getTraversals());
 							prev_bbp.add(bbp);
 							if(prev_bbp.size()==vertex.getPaths().size()) prev_bbp.clear();
 							break;
@@ -708,14 +701,12 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 						//						JOptionPane.showMessageDialog(null, "put stats here", "InfoBox: ", JOptionPane.INFORMATION_MESSAGE);
 						//						JOptionPane.showInputDialog(null, "asdfa", "info", JOptionPane.INFORMATION_MESSAGE );
 						//						changeVertexColor(vertex, Color.CYAN, AllActiveNodes, Color.green);
-						System.out.println("Vertex " + vertex
-								+ " is now selected");
+						//System.out.println("Vertex " + vertex + " is now selected");
 						System.out.println("basic block contains:\n"+vertex.toString());
 						System.out.println("number of execution:\n"+node_weight.get(vertex));
 					} else {
 						//						showActiveNode();
-						System.out.println("Vertex " + vertex
-								+ " no longer selected");
+						//System.out.println("Vertex " + vertex + " no longer selected");
 					}
 				}
 			}
