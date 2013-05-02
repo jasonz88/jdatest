@@ -26,12 +26,15 @@ public class MethodNode {
 		Block b;
 		public String toString(){ 
 			String out=Integer.toString(b.index());
-			//Set<ExternalLink> outgoing=getExternalLinks();
-			//if(outgoing.size()>0){
-				//out+=":";
-				//for(ExternalLink el : outgoing)
-					//out+=", "+el.target.getName();
-			//}
+			Set<ExternalLink> outgoing=getExternalLinks();
+			if(outgoing.size()>0){
+				String comma="";
+				out+=": ";
+				for(ExternalLink el : outgoing){
+					out+=comma+el.target.getName();
+					comma=", ";
+				}
+			}
 			return out;
 		}
 		BasicBlock(Block b){ this.b=b; } 

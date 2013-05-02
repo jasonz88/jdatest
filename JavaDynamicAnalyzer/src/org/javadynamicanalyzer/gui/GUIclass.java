@@ -315,7 +315,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			node_weight.put(v, noOfNode);
 		}
 		
-		
 		ewcs = new EdgeWeightStrokeFunction<T>( edge_weight);
 		show_vertex = new VertexDisplayPredicate<T>(false);
 		
@@ -323,10 +322,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 		vv.getRenderContext().setEdgeLabelTransformer(es);
 		vv.getRenderContext().setEdgeStrokeTransformer(ewcs);
 		vv.getRenderContext().setVertexIncludePredicate(show_vertex);
-		
-		
-		
-		
 		
 		prev_bbp=new HashSet<BasicBlockPath>();
 		final PickedState<T> picked_state = vv.getPickedVertexState();
@@ -372,10 +367,6 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
 				super.mouseClicked(e);
-				//				
-				//
-
-
 			}
 
 			public void mouseEntered(MouseEvent arg0) {
@@ -702,8 +693,9 @@ public class GUIclass<T> extends JApplet implements Iterable<T> {
 						//						JOptionPane.showInputDialog(null, "asdfa", "info", JOptionPane.INFORMATION_MESSAGE );
 						//						changeVertexColor(vertex, Color.CYAN, AllActiveNodes, Color.green);
 						//System.out.println("Vertex " + vertex + " is now selected");
-						System.out.println("basic block contains:\n"+vertex.toString());
-						System.out.println("number of execution:\n"+node_weight.get(vertex));
+						//System.out.println("basic block contains:\n"+vertex.toString());
+						System.out.println(vertex);
+						//System.out.println("number of execution:\n"+node_weight.get(vertex));
 					} else {
 						//						showActiveNode();
 						//System.out.println("Vertex " + vertex + " no longer selected");
