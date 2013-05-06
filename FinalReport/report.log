@@ -1,18 +1,24 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2012.11.13)  6 MAY 2013 01:35
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.10.11)  6 MAY 2013 18:38
 entering extended mode
- %&-line parsing enabled.
-**report.tex
-(./report.tex
-LaTeX2e <2009/09/24>
-Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
-yphenation, farsi, arabic, croatian, bulgarian, ukrainian, russian, czech, slov
-ak, danish, dutch, finnish, french, basque, ngerman, german, german-x-2009-06-1
-9, ngerman-x-2009-06-19, ibycus, monogreek, greek, ancientgreek, hungarian, san
-skrit, italian, latin, latvian, lithuanian, mongolian2a, mongolian, bokmal, nyn
-orsk, romanian, irish, coptic, serbian, turkish, welsh, esperanto, uppersorbian
-, estonian, indonesian, interlingua, icelandic, kurmanji, slovenian, polish, po
-rtuguese, spanish, galician, catalan, swedish, ukenglish, pinyin, loaded.
-(./IEEE/IEEEtran.cls
+**C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/FinalRe
+port/report.tex
+
+(C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/FinalRep
+ort/report.tex
+LaTeX2e <2011/06/27>
+Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
+abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
+croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, ga
+lician, german, german-x-2009-06-19, greek, gujarati, hindi, hungarian, iceland
+ic, indonesian, interlingua, irish, italian, kannada, kurmanji, lao, latin, lat
+vian, lithuanian, malayalam, marathi, mongolian, mongolianlmc, monogreek, ngerm
+an, ngerman-x-2009-06-19, nynorsk, oriya, panjabi, pinyin, polish, portuguese, 
+romanian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swis
+sgerman, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, u
+senglishmax, welsh, loaded.
+
+(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
+ort\IEEE\IEEEtran.cls
 
 LaTeX Warning: You have requested document class `./IEEE/IEEEtran',
                but the document class provides `IEEEtran'.
@@ -27,7 +33,7 @@ Document Class: IEEEtran 2007/03/05 V1.7a by Michael Shell
 \@IEEEtrantmptoksA=\toks14
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 366.
 
-(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+("C:\Program Files\MikTex\tex\latex\psnfss\ot1ptm.fd"
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 -- Using 8.5in x 11in (letter) paper.
@@ -100,10 +106,10 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <24> not available
 \@IEEEtmpitemindent=\dimen116
 \c@IEEEbiography=\count90
 \@IEEEtranrubishbin=\box26
-) (/usr/share/texmf-texlive/tex/latex/tools/tabularx.sty
+) ("C:\Program Files\MikTex\tex\latex\tools\tabularx.sty"
 Package: tabularx 1999/01/07 v2.07 `tabularx' package (DPC)
 
-(/usr/share/texmf-texlive/tex/latex/tools/array.sty
+("C:\Program Files\MikTex\tex\latex\tools\array.sty"
 Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \col@sep=\dimen117
 \extrarowheight=\dimen118
@@ -119,25 +125,26 @@ Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \TX@cols=\count91
 \TX@ftn=\toks16
 )
-(/usr/share/texmf-texlive/tex/latex/ltxmisc/ulem.sty
+("C:\Program Files\MikTex\tex\latex\ulem\ulem.sty"
 \UL@box=\box27
 \UL@hyphenbox=\box28
 \UL@skip=\skip46
 \UL@hook=\toks17
+\UL@height=\dimen124
 \UL@pe=\count92
-\UL@pixel=\dimen124
+\UL@pixel=\dimen125
 \ULC@box=\box29
-Package: ulem 2000/05/26
-\ULdepth=\dimen125
+Package: ulem 2012/05/18
+\ULdepth=\dimen126
 )
-(/usr/share/texmf-texlive/tex/latex/tools/verbatim.sty
+("C:\Program Files\MikTex\tex\latex\tools\verbatim.sty"
 Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
 \every@verbatim=\toks18
 \verbatim@line=\toks19
 \verbatim@in@stream=\read1
 )
-(/usr/share/texmf-texlive/tex/latex/listings/listings.sty
-(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+("C:\Program Files\MikTex\tex\latex\listings\listings.sty"
+("C:\Program Files\MikTex\tex\latex\graphics\keyval.sty"
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks20
 )
@@ -145,36 +152,43 @@ Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \lst@gtempboxa=\box30
 \lst@token=\toks21
 \lst@length=\count94
-\lst@currlwidth=\dimen126
+\lst@currlwidth=\dimen127
 \lst@column=\count95
 \lst@pos=\count96
-\lst@lostspace=\dimen127
-\lst@width=\dimen128
+\lst@lostspace=\dimen128
+\lst@width=\dimen129
 \lst@newlines=\count97
 \lst@lineno=\count98
-\lst@maxwidth=\dimen129
+\lst@maxwidth=\dimen130
 
-(/usr/share/texmf-texlive/tex/latex/listings/lstmisc.sty
+("C:\Program Files\MikTex\tex\latex\listings\lstmisc.sty"
 File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 \c@lstnumber=\count99
 \lst@skipnumbers=\count100
 \lst@framebox=\box31
 )
-(/usr/share/texmf-texlive/tex/latex/listings/listings.cfg
+("C:\Program Files\MikTex\tex\latex\listings\listings.cfg"
 File: listings.cfg 2007/02/22 1.4 listings configuration
 ))
 Package: listings 2007/02/22 1.4 (Carsten Heinz)
 
-(/usr/share/texmf/tex/latex/xcolor/xcolor.sty
+("C:\Program Files\MikTex\tex\latex\xcolor\xcolor.sty"
 Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
 
-(/etc/texmf/tex/latex/config/color.cfg
+("C:\Program Files\MikTex\tex\latex\00miktex\color.cfg"
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package xcolor Info: Driver file: pdftex.def on input line 225.
 
-(/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
-File: pdftex.def 2010/03/12 v0.04p Graphics/color for pdfTeX
+("C:\Program Files\MikTex\tex\latex\pdftex-def\pdftex.def"
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+("C:\Program Files\MikTex\tex\generic\oberdiek\infwarerr.sty"
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+("C:\Program Files\MikTex\tex\generic\oberdiek\ltxcmds.sty"
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
 \Gread@gobject=\count101
 )
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1337.
@@ -187,7 +201,7 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
 )
-(/usr/share/texmf-texlive/tex/latex/base/textcomp.sty
+("C:\Program Files\MikTex\tex\latex\base\textcomp.sty"
 Package: textcomp 2005/09/27 v1.99g Standard LaTeX package
 Package textcomp Info: Sub-encoding information:
 (textcomp)               5 = only ISO-Adobe without \textcurrency
@@ -202,7 +216,7 @@ Package textcomp Info: Sub-encoding information:
 (textcomp)             See the documentation for details.
 Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 71.
 
-(/usr/share/texmf-texlive/tex/latex/base/ts1enc.def
+("C:\Program Files\MikTex\tex\latex\base\ts1enc.def"
 File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
 )
 LaTeX Info: Redefining \oldstylenums on input line 266.
@@ -237,78 +251,119 @@ Package textcomp Info: Setting pxtt sub-encoding to TS1/0 on input line 307.
 Package textcomp Info: Setting txr sub-encoding to TS1/0 on input line 308.
 Package textcomp Info: Setting txss sub-encoding to TS1/0 on input line 309.
 Package textcomp Info: Setting txtt sub-encoding to TS1/0 on input line 310.
-Package textcomp Info: Setting futs sub-encoding to TS1/4 on input line 311.
-Package textcomp Info: Setting futx sub-encoding to TS1/4 on input line 312.
-Package textcomp Info: Setting futj sub-encoding to TS1/4 on input line 313.
-Package textcomp Info: Setting hlh sub-encoding to TS1/3 on input line 314.
-Package textcomp Info: Setting hls sub-encoding to TS1/3 on input line 315.
-Package textcomp Info: Setting hlst sub-encoding to TS1/3 on input line 316.
-Package textcomp Info: Setting hlct sub-encoding to TS1/5 on input line 317.
-Package textcomp Info: Setting hlx sub-encoding to TS1/5 on input line 318.
-Package textcomp Info: Setting hlce sub-encoding to TS1/5 on input line 319.
-Package textcomp Info: Setting hlcn sub-encoding to TS1/5 on input line 320.
-Package textcomp Info: Setting hlcw sub-encoding to TS1/5 on input line 321.
-Package textcomp Info: Setting hlcf sub-encoding to TS1/5 on input line 322.
-Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 323.
-Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 324.
-Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 325.
-Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 326.
+Package textcomp Info: Setting lmr sub-encoding to TS1/0 on input line 311.
+Package textcomp Info: Setting lmdh sub-encoding to TS1/0 on input line 312.
+Package textcomp Info: Setting lmss sub-encoding to TS1/0 on input line 313.
+Package textcomp Info: Setting lmssq sub-encoding to TS1/0 on input line 314.
+Package textcomp Info: Setting lmvtt sub-encoding to TS1/0 on input line 315.
+Package textcomp Info: Setting qhv sub-encoding to TS1/0 on input line 316.
+Package textcomp Info: Setting qag sub-encoding to TS1/0 on input line 317.
+Package textcomp Info: Setting qbk sub-encoding to TS1/0 on input line 318.
+Package textcomp Info: Setting qcr sub-encoding to TS1/0 on input line 319.
+Package textcomp Info: Setting qcs sub-encoding to TS1/0 on input line 320.
+Package textcomp Info: Setting qpl sub-encoding to TS1/0 on input line 321.
+Package textcomp Info: Setting qtm sub-encoding to TS1/0 on input line 322.
+Package textcomp Info: Setting qzc sub-encoding to TS1/0 on input line 323.
+Package textcomp Info: Setting qhvc sub-encoding to TS1/0 on input line 324.
+Package textcomp Info: Setting futs sub-encoding to TS1/4 on input line 325.
+Package textcomp Info: Setting futx sub-encoding to TS1/4 on input line 326.
+Package textcomp Info: Setting futj sub-encoding to TS1/4 on input line 327.
+Package textcomp Info: Setting hlh sub-encoding to TS1/3 on input line 328.
+Package textcomp Info: Setting hls sub-encoding to TS1/3 on input line 329.
+Package textcomp Info: Setting hlst sub-encoding to TS1/3 on input line 330.
+Package textcomp Info: Setting hlct sub-encoding to TS1/5 on input line 331.
+Package textcomp Info: Setting hlx sub-encoding to TS1/5 on input line 332.
+Package textcomp Info: Setting hlce sub-encoding to TS1/5 on input line 333.
+Package textcomp Info: Setting hlcn sub-encoding to TS1/5 on input line 334.
+Package textcomp Info: Setting hlcw sub-encoding to TS1/5 on input line 335.
+Package textcomp Info: Setting hlcf sub-encoding to TS1/5 on input line 336.
+Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 337.
+Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 338.
+Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 339.
+Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 340.
 )
-(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+("C:\Program Files\MikTex\tex\latex\algorithms\algorithm.sty"
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+("C:\Program Files\MikTex\tex\latex\float\float.sty"
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count102
+\float@exts=\toks22
+\float@box=\box32
+\@float@everytoks=\toks23
+\@floatcapt=\box33
+)
+("C:\Program Files\MikTex\tex\latex\base\ifthen.sty"
+Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks24
+\c@algorithm=\count103
+)
+("C:\Program Files\MikTex\tex\latex\algorithms\algorithmic.sty"
+Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
+\c@ALC@unique=\count104
+\c@ALC@line=\count105
+\c@ALC@rem=\count106
+\c@ALC@depth=\count107
+\ALC@tlm=\skip47
+\algorithmicindent=\skip48
+)
+("C:\Program Files\MikTex\tex\latex\graphics\graphicx.sty"
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+("C:\Program Files\MikTex\tex\latex\graphics\graphics.sty"
 Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+("C:\Program Files\MikTex\tex\latex\graphics\trig.sty"
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-(/etc/texmf/tex/latex/config/graphics.cfg
-File: graphics.cfg 2009/08/28 v1.8 graphics configuration of TeX Live
+("C:\Program Files\MikTex\tex\latex\00miktex\graphics.cfg"
+File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
 )
 Package graphics Info: Driver file: pdftex.def on input line 91.
 )
-\Gin@req@height=\dimen130
-\Gin@req@width=\dimen131
-) (./report.aux)
-\openout1 = `report.aux'.
-
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 42.
-LaTeX Font Info:    ... okay on input line 42.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 42.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 42.
-
-(/usr/share/texmf-texlive/tex/latex/base/ts1cmr.fd
+\Gin@req@height=\dimen131
+\Gin@req@width=\dimen132
+)
+(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
+ort\report.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 44.
+LaTeX Font Info:    ... okay on input line 44.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 44.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 44.
+ ("C:\Program Files\MikTex\tex\latex\base\ts1cmr.fd"
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 42.
-\c@lstlisting=\count102
+LaTeX Font Info:    ... okay on input line 44.
+\c@lstlisting=\count108
 
-(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+("C:\Program Files\MikTex\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count103
-\scratchdimen=\dimen132
-\scratchbox=\box32
-\nofMPsegments=\count104
-\nofMParguments=\count105
-\everyMPshowfont=\toks22
-\MPscratchCnt=\count106
-\MPscratchDim=\dimen133
-\MPnumerator=\count107
-\everyMPtoPDFconversion=\toks23
+\scratchcounter=\count109
+\scratchdimen=\dimen133
+\scratchbox=\box34
+\nofMPsegments=\count110
+\nofMParguments=\count111
+\everyMPshowfont=\toks25
+\MPscratchCnt=\count112
+\MPscratchDim=\dimen134
+\MPnumerator=\count113
+\makeMPintoPDFobject=\count114
+\everyMPtoPDFconversion=\toks26
 )
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 43.
- (/usr/share/texmf-texlive/tex/latex/psnfss/ot1pcr.fd
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 45.
+ ("C:\Program Files\MikTex\tex\latex\psnfss\ot1pcr.fd"
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 Missing character: There is no ‚ in font ptmr7t!
@@ -317,17 +372,23 @@ Missing character: There is no ô in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
+
+
+LaTeX Warning: Citation `VisualVM' on page 1 undefined on input line 63.
+
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
 
-(/usr/share/texmf-texlive/tex/latex/listings/lstlang1.sty
+LaTeX Warning: Citation `Emma' on page 1 undefined on input line 70.
+
+("C:\Program Files\MikTex\tex\latex\listings\lstlang1.sty"
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
-(/usr/share/texmf-texlive/tex/latex/listings/lstlang1.sty
+("C:\Program Files\MikTex\tex\latex\listings\lstlang1.sty"
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
-(/usr/share/texmf-texlive/tex/latex/listings/lstmisc.sty
+("C:\Program Files\MikTex\tex\latex\listings\lstmisc.sty"
 File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 )
 Missing character: There is no ‚ in font ptmr7t!
@@ -342,17 +403,24 @@ Missing character: There is no ú in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ù in font ptmr7t!
+
+
+LaTeX Warning: Citation `Javaassist' on page 1 undefined on input line 108.
+
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
- [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
+[1{C:/Users/Dongyang/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
 
 ]
-<JDAtool.png, id=7, 539.01375pt x 363.3575pt>
+<JDAtool.png, id=8, 539.01375pt x 363.3575pt>
 File: JDAtool.png Graphic file (type png)
  <use JDAtool.png>
-Underfull \hbox (badness 3148) in paragraph at lines 151--155
+Package pdftex.def Info: JDAtool.png used on input line 138.
+(pdftex.def)             Requested size: 247.6778pt x 166.9635pt.
+
+Underfull \hbox (badness 3148) in paragraph at lines 153--157
 []\OT1/ptm/m/n/10 The core of all method in-for-ma-tion re-sides in the
  []
 
@@ -365,10 +433,47 @@ Missing character: There is no ô in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
+[2 <C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/Final
+Report/JDAtool.png>]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 187.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 187.
+ <layout_demo2.png, id=15, 231.86626pt x 393.72093pt>
+File: layout_demo2.png Graphic file (type png)
+
+<use layout_demo2.png>
+Package pdftex.def Info: layout_demo2.png used on input line 194.
+(pdftex.def)             Requested size: 115.93283pt x 196.85999pt.
+ <layout_demo.png, id=16, 733.23938pt x 433.62pt>
+File: layout_demo.png Graphic file (type png)
+
+<use layout_demo.png>
+Package pdftex.def Info: layout_demo.png used on input line 201.
+(pdftex.def)             Requested size: 241.96974pt x 143.09503pt.
+ [3] <gui.png, id=24, 563.85657pt x 308.65312pt>
+File: gui.png Graphic file (type png)
+
+<use gui.png>
+Package pdftex.def Info: gui.png used on input line 266.
+(pdftex.def)             Requested size: 236.81815pt x 129.63342pt.
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
-[2 <./JDAtool.png>] (./report.bbl)
+
+(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
+ort\report.bbl
+
+! LaTeX Error: Something's wrong--perhaps a missing \item.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.24 \end{thebibliography}
+                          
+? 
+)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -380,24 +485,35 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[3
+[4 <C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/Final
+Report/layout_demo2.png> <C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/jav
+adynamicanalyzer/FinalReport/layout_demo.png> <C:/Users/Dongyang/jsworkspace/ja
+vadynamicanalyzer/javadynamicanalyzer/FinalReport/gui.png>]
+(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
+ort\report.aux)
 
-] (./report.aux) ) 
+LaTeX Warning: There were undefined references.
+
+ ) 
 Here is how much of TeX's memory you used:
- 4112 strings out of 493848
- 59572 string characters out of 1152822
- 148466 words of memory out of 3000000
- 7378 multiletter control sequences out of 15000+50000
- 32156 words of font info for 66 fonts, out of 3000000 for 9000
- 714 hyphenation exceptions out of 8191
- 33i,9n,58p,278b,1035s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/share/texmf-texlive/fonts/enc/dvips/base/8r.enc}</usr/s
-hare/texmf-texlive/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-texlive
-/fonts/type1/urw/times/utmr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/tim
-es/utmri8a.pfb>
-Output written on report.pdf (3 pages, 60655 bytes).
+ 4651 strings out of 494045
+ 67526 string characters out of 3149989
+ 158549 words of memory out of 3000000
+ 7908 multiletter control sequences out of 15000+200000
+ 33263 words of font info for 67 fonts, out of 3000000 for 9000
+ 715 hyphenation exceptions out of 8191
+ 33i,9n,58p,1135b,1035s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Program Files/MikTex/fonts/enc/dvips/fontname/8r.enc}<C:/Program Files/Mi
+kTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MikTex/fonts/t
+ype1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MikTex/fonts/type1/public/a
+msfonts/cm/cmsy10.pfb><C:/Program Files/MikTex/fonts/type1/public/amsfonts/cm/c
+msy7.pfb><C:/Program Files/MikTex/fonts/type1/urw/courier/ucrr8a.pfb><C:/Progra
+m Files/MikTex/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MikTex/fonts/
+type1/urw/times/utmr8a.pfb><C:/Program Files/MikTex/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on report.pdf (4 pages, 340789 bytes).
 PDF statistics:
- 28 PDF objects out of 1000 (max. 8388607)
+ 57 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

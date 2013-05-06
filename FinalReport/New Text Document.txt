@@ -1,0 +1,4 @@
+\section{GUI}
+The GUI is launched at the end of the main function of the instrumented program. The main purpose of the GUI is to enable better interpretation of the statistics JDA generates. In fact, almost all information JDA analyzes are related to Control Flow Graph vertices and edges. Thus, building a graphical interface with control flow graph is worthwhile. On one hand, a lot of information can be shown in a macroscopic manner immediately after the rendering of the control flow graph. e.g. active nodes, code coverage, edge weight etc. On the other hand, more detailed information is accessable by text area output in the GUI invoked by mouse listeners, which facilitates the search for certain statistics the user cares about.
+\section{JUNG Library}
+We build our GUI based on the JUN

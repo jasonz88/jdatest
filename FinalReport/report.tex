@@ -7,6 +7,8 @@
 \usepackage{xcolor}
 \usepackage{textcomp}
 %\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
  \ifCLASSINFOpdf
     \usepackage[pdftex]{graphicx}
@@ -176,9 +178,98 @@ They can then update the caller’s MethodNode with a now known ExternalLink.
 In order to track ExternalLinks, the trackBlocks option must be enabled.
 
 \section{GUI}
-The GUI is launched at the end of the main function of the instrumented program.
+The GUI is launched at the end of the main function of the instrumented program, which ensures that the launch of the GUI will not interfere with the instrumention or add jitter to the runtime statistics. The main purpose of the GUI is to enable better interpretation of the statistics JDA generates. In fact, almost all information JDA analyzes are related to Control Flow Graph vertices and edges. Thus, building a graphical interface with control flow graph is worthwhile. On one hand, a lot of information can be shown in a macroscopic manner immediately after the rendering of the control flow graph. e.g. active nodes, code coverage, edge weight etc. On the other hand, more detailed information is accessable by text area output in the GUI invoked by mouse listeners, which facilitates the search for certain statistics the user cares about.
+
+Based on the methodology we do the intrumentation and build the JDA tool. We design the GUI to be multiple instance and for every methodnode the GUI will provide related data and interface to the basicblock and paths between them in a JFrame. The main chanllenge in the GUI is to provide a stable layout for the control flow graph. When it comes to graph layout, there exisits numerous layout algorithms to fulfill various constraints. e.g KK layout, FR layout etc.
+
+But in our application, the graph we are looking at is the control flow graph with potentially complex structures. Thus, the name of the game becomes devising an algorithm that produce efficient and clean CFG layout. The requirements are four folded: unique layout for specific input, no overlapping in nodes or edges, space efficient and the flow goes in top-down direction.
+
+Algorithm \ref{alg1} is the algorithm we use to position the control flow graph. It can be easily proved that our algorithm generates a non-overlapping layout in $O (V+E)$ time complexity. It is a BFS based algorithm. When designing the layout algorithm, we make the decision that only expand the graph in width to the right, which lowers space consumption but is prone to more overlapping. In our algorithm we solve this problem by expanding the ansestors when there exisits branches in successors. The caveat is if we always use the indentation as the summation of successors, the graph will easily expand to a large size in width given a branchy input. The insight is we can reset the indentation as we see a vertex that has only one child, e.g. the vertex 4 in the graph as shown in Figure \ref{eg1}. Vertex 4 here has successor 6 that is of 3 children. But as long as there is no other branch within two levels, i.e. vertex 6 is the only child of vertex 4, we can reset the indentation vertex 4 returned to upper level.
+
+Figure \ref{dm1} shows the comparison between our algorithm and other main stream solution to CFG layout. All four CFGs are of same structure and the only difference is our algorithm doesn't make the start block and return block a separate one, and we forced the block with return statement to the bottom with more distance to upper levels. Comparison shows our algorithm saves more space in both width and height even if the input problem size is just medium. Meanwhile, our algorithm doesn't compromise the clear interpretation of the control flow.
+
+
+\begin{figure}[t]
+\center
+  \includegraphics[scale=0.5]{layout_demo2.png}
+  \caption{Indentation of our algorithm}
+  \label{eg1}
+\end{figure}
+
+\begin{figure}[t]
+\center
+  \includegraphics[scale=0.33]{layout_demo.png}
+  \caption{Comparison of different layout algorithms}
+  \label{dm1}
+\end{figure}
+
+\begin{algorithm}                      % enter the algorithm environment
+\caption{CFG layout}          % give the algorithm a caption
+\label{alg1}                           % and a label for \ref{} commands later in the document
+\begin{algorithmic}[1]               % enter the algorithmic environment
+
+    \REQUIRE $G=(V,A)$\\ $\exists !\ start \in V,\ s.t.\ Indegree(start)=0,$\\ $\exists\ E \in V,\   s.t. \ \forall \ end \in E, \ Outdegree(end)=0$
+    \ENSURE $Postion(G),\ \forall\ v\in V, \ \not\exists \ v,\ v' \in V,\  v \not= v'$\\$\ s.t. \ Position(v)=Position(v')$\\
+    \STATE $start \Leftarrow initpos(initx,inity)$
+\STATE $Visited$  $\cup \Leftarrow start$
+\STATE $N \Leftarrow SortedSuccessors(start)$
+ \STATE $maxWidth,\ maxDepth\  \Leftarrow$\\$SuccessorLayout(N,\ initx,\ inity+\Delta y,\ Visited)$ 
+    \FORALL{$end \in E$}
+      \STATE $end \Leftarrow endpos(initx,inity+maxDepth+\Delta y)$
+       \STATE $Next$	
+        \STATE $initx \Leftarrow initx+\Delta x$
+    \ENDFOR
+\RETURN
+\end{algorithmic}
+
+\begin{algorithmic}
+\STATE $ SuccessorLayout$
+\end{algorithmic}
+
+
+\begin{algorithmic}[1]
+ \REQUIRE $N,\ width,\ depth,\ Visited$
+    \ENSURE $maxWidth,\ maxDepth$\\
+        \IF{$N = \{\}$}
+           \RETURN $width,\ depth$
+        \ELSE
+            \STATE $newdepth \Leftarrow depth$
+            \STATE $successorCount \Leftarrow 0$
+\FORALL{$n \in N$}
+	\IF{$n \not\in Visited$}
+	\STATE $continue$
+	\ENDIF
+	\STATE $Visited$  $\cup \Leftarrow n$
+	\STATE $n \Leftarrow initpos(width,depth)$
+	\STATE $maxWidth,\ maxDepth\  \Leftarrow$\\$SuccessorLayout(N,\ width,\ depth+\Delta y,$\\$Visited)$
+       \STATE $Next$	
+	\STATE $newdepth \Leftarrow$\\$MAX(newdepth, maxDepth)$
+	\STATE $width \Leftarrow$\\$width+\Delta x * (OutDegree(n)+maxWidth)$
+	\STATE $successorCount \Leftarrow$\\$successorCount + OutDegree(n)-1$ 
+\ENDFOR
+	\IF{$size(N) = 1$}
+	\STATE $maxWidth \Leftarrow 0$
+	\ELSE
+	\STATE $maxWidth \Leftarrow successorCount$
+        \ENDIF
+        \STATE $maxDepth \Leftarrow newDepth$
+        \RETURN  $maxWidth,\ maxDepth$
+\ENDIF
+\end{algorithmic} 
+\end{algorithm}
+
 \section{JUNG Library}
+We searched and investigated different Java graph libraries and decide to use JUNG as the framework to build our GUI. JUNG, the Java Universal Network/Graph Framework is a software library that provides a common and extendible language for the modeling, analysis, and visualization of data that can be represented as a graph or network. It is written in Java, which allows JUNG-based applications to make use of the extensive built-in capabilities of the Java API, as well as those of other existing third-party Java libraries. The JUNG library provides powerful graph representation and easily customized graph APIs. In our GUI, we used the mouse listener, vertex/edges render/transformer along with Java build-in javax.swing package to realize most of the functionalities. 
 \section{Features}
+\begin{figure}[t]
+\center
+  \includegraphics[scale=0.42]{gui.png}
+  \caption{GUI window}
+  \label{gui}
+\end{figure}
+
+As shown in Figure \ref{gui}, our GUI pops out after the instrumentation program finishes. It will show the user with the CFG of each method in the class with different colors indicating the activeness and size indicating whether there is method call in the basic block. edges are filled with number of executions of all the path that pass through this edge. The mouse listeners has two modes, transforming and picking. In transforming mode, users can drag, rotate, zoom in/out the whole graph. In picking mode, users can click on a certain node to see the statistics in the textarea and see the path that go through that nodes one by one. On the control panel, the user can change the type and offset of the edges to render the graph, reset the graph, choose mouse modes as well as filter out infrequent nodes/path by input a threshold. In case of more  A examiner lens is also provided to see the details of the graph when there are great amount of basic blocks in a method.
+
 
 \section{Future Work}
 There is a good deal of improvement that can be made to the JDA’s path tracking features.
