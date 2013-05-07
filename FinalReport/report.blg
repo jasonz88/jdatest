@@ -1,17 +1,56 @@
-This is BibTeX, Version 0.99dThe top-level auxiliary file: report.aux
+This is BibTeX, Version 0.99d (TeX Live 2012)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: report.aux
 The style file: ./IEEE/IEEEtran.bst
-I couldn't open database file report.bib.bib
----line 21 of file report.aux
- : \bibdata{report.bib
- :                    }
-I'm skipping whatever remains of this command
-I found no database files---while reading file report.aux
-Warning--I didn't find a database entry for "VisualVM"
-Warning--I didn't find a database entry for "Emma"
-Warning--I didn't find a database entry for "Javaassist"
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: report.bib.bib
 -- IEEEtran.bst version 1.12 (2007/01/11) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
 
 Done.
-(There were 2 error messages)
+You've used 5 entries,
+            4024 wiz_defined-function locations,
+            829 strings with 7597 characters,
+and the built_in function-call counts, 1846 in all, are:
+= -- 118
+> -- 24
+< -- 8
++ -- 13
+- -- 4
+* -- 65
+:= -- 298
+add.period$ -- 6
+call.type$ -- 5
+change.case$ -- 1
+chr.to.int$ -- 15
+cite$ -- 5
+duplicate$ -- 159
+empty$ -- 183
+format.name$ -- 5
+if$ -- 392
+int.to.chr$ -- 0
+int.to.str$ -- 5
+missing$ -- 35
+newline$ -- 38
+num.names$ -- 3
+pop$ -- 99
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 156
+stack$ -- 0
+substring$ -- 35
+swap$ -- 90
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 5
+warning$ -- 0
+while$ -- 7
+width$ -- 6
+write$ -- 55

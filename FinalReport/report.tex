@@ -103,7 +103,7 @@ To instrument a program using the JDA, the following command is used.
 \end{lstlisting}
 
 The instrumentation is done by implementing the “ClassFileTransformer” interface in the javaagent class.
-This interface provides a transform() function which essentially takes a byte array input and gives a byte array output.
+This interface provides a transform function which essentially takes a byte array input and gives a byte array output.
 All classes that are loaded by the ClassLoader are run through this transformation, which ultimately inserts profiling code.
 Finally, bytecode interpretation and instrumentation is done with the help of Javaassist \cite{Javaassist}, which is a bytecode instrumentation library that’s known for allowing users to insert source code rather than manually constructing bytecodes.
 While the ease of some API calls is highly beneficial, lower level instrumentation becomes burdensome when trying to access the information created by the higher level API calls.
@@ -140,15 +140,6 @@ Figure \ref{fig:JDAtool} shows the overall data hierarchy of the JDA.
   \label{fig:JDAtool}
 \end{figure}
 
-\subsection{TimestampList}
-The TimestampList is essentially a list of time blocks that do not include instrumentation at the beginning and end of methods.
-The small amount of instrumentation at the beginning of bytecode basic blocks, however, is too fine grain to exclude from timing.
-Naturally, the instrumentation for this option occurs at the beginning end of methods.
-The time that the code enters and exits instrumentation blocks can be subtracted from the overall method execution time to retrieve the native method run time.
-Afterwards, blocks of times can be summed together and the extra blocks removed to save memory.
-The noise, granularity, and odd JIT optimizations make the accuracy questionable for smaller methods, however large methods behave appropriately.
-The featuer can be turned on by setting the trackTimes option.
-
 \subsection{MethodNode}
 The core of all method information resides in the MethodNode class.
 Every unique method tag (which includes overloaded methods) reserves its own persistent MethodNode.
@@ -177,28 +168,81 @@ With the MethodStack and block ID updates in each MSE, methods can extrapolate w
 They can then update the caller’s MethodNode with a now known ExternalLink.  
 In order to track ExternalLinks, the trackBlocks option must be enabled.
 
+\subsection{TimestampList}
+The TimestampList (TLS) is essentially a list of time blocks that do not include instrumentation at the beginning and end of methods.
+The TSL has a start and stop function that is used to record method execution.
+When the TSL is told to start, it will record the current time.
+When the TSl is told to stop, it will push onto the list the difference from the start time and the current time.
+
+Since methods have fairly significant instrumentation at the beginning and end of their code blocks, it is necessary to ensure that the timing statistics do not include these instrumentation sections.
+At the beginning of every method, the TSL is given a stop command which pushes the current time difference onto the list.
+The instrumentation at the beginning of the method can then be executed without impacting the overall time.
+After the beginning instrumentation, the TSL is given the start command again.
+
+The end of the method follows a very similar routine.
+The stop command is first called at the end of the method so that the method's native code timing is added to the TSL.
+At this point, there is a small memory optimization that can potentially save lots of memory being consumed by the TSL.
+The methods store the current index of the TSL at the beginning of the method.
+At the end of the method, they can add all of the times from that index to to the current index, remove those TSL entries, and add the final time to the list.
+If the method does not call any other methods, then this optimization does nothing since there is only one new TSL entry since the beginning of that method.
+However, methods that do call other methods will have lots of sparse timing entries that can be combined.
+The pruning is done at the end of every method to reduce the memory complexity of the TSL.
+
+The noise, granularity, and odd JIT optimizations make the accuracy of the TSL questionable for smaller methods, however large methods behave appropriately.
+Additionally, The feature can be turned on by setting the trackTimes option.
+Aside from timing small functions, the only other caveat to timing statistics is that they do not exclude the basic block instrumentation.
+There is still instrumentation at the beginning of bytecode basic blocks if block tracking is turned on, however it is too fine grained to exclude from timing.
+
+\section{JUNG Library}
+All of the instrumentation gathers data into the JDAtool class, however the purpose of this tool is to graphically show the harvested information.
+We investigated different Java CFG libraries and decide to use JUNG as the framework to build our GUI \cite{JUNG}.
+JUNG, the Java Universal Network/Graph Framework, is a software library that provides a common and extendible language for the modeling, analysis, and visualization of data that can be represented as a graph or network.
+The JUNG library provides powerful graph representation and easily customized graph APIs.
+In our GUI, we used the mouse listener, vertex/edges render/transformer along with Java build-in javax.swing package to realize most of the functionalities. 
+
 \section{GUI}
-The GUI is launched at the end of the main function of the instrumented program, which ensures that the launch of the GUI will not interfere with the instrumention or add jitter to the runtime statistics. The main purpose of the GUI is to enable better interpretation of the statistics JDA generates. In fact, almost all information JDA analyzes are related to Control Flow Graph vertices and edges. Thus, building a graphical interface with control flow graph is worthwhile. On one hand, a lot of information can be shown in a macroscopic manner immediately after the rendering of the control flow graph. e.g. active nodes, code coverage, edge weight etc. On the other hand, more detailed information is accessable by text area output in the GUI invoked by mouse listeners, which facilitates the search for certain statistics the user cares about.
+The GUI is launched at the end of the main function of the instrumented program, which ensures that the launch of the GUI will not interfere with the instrumention or add jitter to the runtime statistics.
+The main purpose of the GUI is to enable better interpretation of the statistics that JDA generates.
+In fact, almost all of the information that the JDA analyzes are related to Control Flow Graph vertices and edges.
+A graphical interface with control flow graph is allows the user to interpret the gathered data in an organized fashion.
+A lot of information can be shown in a macroscopic manner immediately after the rendering of the control flow graph. 
+This includes the locations of active nodes, code coverage, edge weight, and related timing statistics.
+On the other hand, more detailed information is accessable by text area output in the GUI invoked by mouse listeners, which facilitates the search for certain statistics the user cares about such as method invocations and pathing.
 
-Based on the methodology we do the intrumentation and build the JDA tool. We design the GUI to be multiple instance and for every methodnode the GUI will provide related data and interface to the basicblock and paths between them in a JFrame. The main chanllenge in the GUI is to provide a stable layout for the control flow graph. When it comes to graph layout, there exisits numerous layout algorithms to fulfill various constraints. e.g KK layout, FR layout etc.
+We designed every MethodNode to launch its own GUI so that the individual GUIs are only responsible for small chunks of data as well as allowing the user to swap between MethodNodes easily.
+The main chanllenge in the GUI is to provide a stable layout for the control flow graph.
+When it comes to graph layout, there are numerous layout algorithms to fulfill various constraints.
+For instance, JUNG  KK layout, FR layout, and tree layout algorithms.
+In our application, the graph we are looking at is the control flow graph with potentially complex structures.
+Devising an algorithm that produce efficient and clean CFG layout becomes the main problem.
+There are three main requirements for the layout: no overlapping in nodes or edges, space efficient, and the flow goes in top-down direction.
 
-But in our application, the graph we are looking at is the control flow graph with potentially complex structures. Thus, the name of the game becomes devising an algorithm that produce efficient and clean CFG layout. The requirements are four folded: unique layout for specific input, no overlapping in nodes or edges, space efficient and the flow goes in top-down direction.
+Algorithm \ref{alg1} is the algorithm we use to position the control flow graph.
+this algorithm generates a non-overlapping layout in $O (V+E)$ time complexity.
+It is based on a breadth-first search (BFS) algorithm \cite{kamada1989algorithm}.
+When designing the layout algorithm, we make the decision to only expand the graph in width to the right, which lowers space consumption but is prone to more overlapping.
+We solve this problem by expanding the ancestors when there exsists branches in successors.
+The caveat is that the graph will easily expand to a large size in width given a branchy input if we always use the indentation as the summation of successors.
+To avoid this, we can reset the indentation as we see a vertex that has only one child.
+For example, vertex 4\ in the graph as shown in Figure \ref{eg1} has successor 6 which has 3 children.
+As long as there is no other branch within two levels (vertex 6 is the only child of vertex 4) then we can reset the indentation of vertex 4\ in upper level.
 
-Algorithm \ref{alg1} is the algorithm we use to position the control flow graph. It can be easily proved that our algorithm generates a non-overlapping layout in $O (V+E)$ time complexity. It is a BFS based algorithm. When designing the layout algorithm, we make the decision that only expand the graph in width to the right, which lowers space consumption but is prone to more overlapping. In our algorithm we solve this problem by expanding the ansestors when there exisits branches in successors. The caveat is if we always use the indentation as the summation of successors, the graph will easily expand to a large size in width given a branchy input. The insight is we can reset the indentation as we see a vertex that has only one child, e.g. the vertex 4 in the graph as shown in Figure \ref{eg1}. Vertex 4 here has successor 6 that is of 3 children. But as long as there is no other branch within two levels, i.e. vertex 6 is the only child of vertex 4, we can reset the indentation vertex 4 returned to upper level.
+Figure \ref{dm1} shows the comparison between our algorithm and other main stream solution to CFG layout.
+All four CFGs have the same structure.
+The only difference is our algorithm does not make the start block and return block a separate one, and we forced the block with the return statement to the bottom.
+Comparison shows our algorithm saves more space in both width and height even with modest inputs.
+Additionally, our algorithm doesn't compromise the clear interpretation of the control flow.
 
-Figure \ref{dm1} shows the comparison between our algorithm and other main stream solution to CFG layout. All four CFGs are of same structure and the only difference is our algorithm doesn't make the start block and return block a separate one, and we forced the block with return statement to the bottom with more distance to upper levels. Comparison shows our algorithm saves more space in both width and height even if the input problem size is just medium. Meanwhile, our algorithm doesn't compromise the clear interpretation of the control flow.
-
-
-\begin{figure}[t]
+\begin{figure}[h]
 \center
-  \includegraphics[scale=0.5]{layout_demo2.png}
+  \includegraphics[width=0.5\textwidth]{layout_demo2.png}
   \caption{Indentation of our algorithm}
   \label{eg1}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[h]
 \center
-  \includegraphics[scale=0.33]{layout_demo.png}
+  \includegraphics[width=0.5\textwidth]{layout_demo.png}
   \caption{Comparison of different layout algorithms}
   \label{dm1}
 \end{figure}
@@ -258,18 +302,21 @@ Figure \ref{dm1} shows the comparison between our algorithm and other main strea
 \end{algorithmic} 
 \end{algorithm}
 
-\section{JUNG Library}
-We searched and investigated different Java graph libraries and decide to use JUNG as the framework to build our GUI. JUNG, the Java Universal Network/Graph Framework is a software library that provides a common and extendible language for the modeling, analysis, and visualization of data that can be represented as a graph or network. It is written in Java, which allows JUNG-based applications to make use of the extensive built-in capabilities of the Java API, as well as those of other existing third-party Java libraries. The JUNG library provides powerful graph representation and easily customized graph APIs. In our GUI, we used the mouse listener, vertex/edges render/transformer along with Java build-in javax.swing package to realize most of the functionalities. 
-\section{Features}
-\begin{figure}[t]
+As shown in Figure \ref{gui}, our GUI pops out after the instrumentation program finishes.
+It will show the CFG of each method in the class with different colors indicating node activeness and size indicating whether there is method call in that node.
+Edges are filled with number of executions of all the path that pass through this edge.
+The mouse listeners have two modes: transforming and picking.
+In transforming mode, users can drag, rotate, zoom in/out the whole graph.
+In picking mode, users can click on a certain node to see the statistics in the textarea and see the path that go through that nodes one by one.
+On the control panel, the user can change the type and offset of the edges to render the graph, reset the graph, choose mouse modes as well as filter out infrequent nodes/path by input a threshold.
+An examiner lens is also provided to see the details of the graph for more complex CFGs.
+
+\begin{figure*}[t]
 \center
-  \includegraphics[scale=0.42]{gui.png}
+  \includegraphics[width=\textwidth]{gui.png}
   \caption{GUI window}
   \label{gui}
-\end{figure}
-
-As shown in Figure \ref{gui}, our GUI pops out after the instrumentation program finishes. It will show the user with the CFG of each method in the class with different colors indicating the activeness and size indicating whether there is method call in the basic block. edges are filled with number of executions of all the path that pass through this edge. The mouse listeners has two modes, transforming and picking. In transforming mode, users can drag, rotate, zoom in/out the whole graph. In picking mode, users can click on a certain node to see the statistics in the textarea and see the path that go through that nodes one by one. On the control panel, the user can change the type and offset of the edges to render the graph, reset the graph, choose mouse modes as well as filter out infrequent nodes/path by input a threshold. In case of more  A examiner lens is also provided to see the details of the graph when there are great amount of basic blocks in a method.
-
+\end{figure*}
 
 \section{Future Work}
 There is a good deal of improvement that can be made to the JDA’s path tracking features.
@@ -280,7 +327,14 @@ There are various ways to hash loops, and thus the hashing method should be conf
 The concept of the JDA was more focused around tracking virtual method invocations, however the baseline instrumentation is already in place for more complex analysis.
 
 \section{Conclusion}
-We made this tool that provides information.
+Other profiling tools tend to specialize in certain niche areas, and they actually perform better than JDA for these situations.
+Similar to other profiling tools, JDA can learn different statistics about a program during runtime via instrumentation.
+However, JDA is a tool that embraces a broad number of profiling concepts such as code coverage and performance timing in a single tool.
+JDA also provides the lower level bytecode basic block pathing and coverage information that is not included in other source code coverage tools.
+The pathing also extends beyond local method CFGs by tracking additional method calls like $invokevirtual$ through a method stack.
+Additionally, The various types of instrumentation can be toggled with different inputs into the javaagent.
+At the end of the instrumented program, an informative GUI is launched to graphically and interactively show all of the information.
+JDA can be a great help to software developers to quickly determine if tests cover the bytecode sections that they want while providing additional information to aid their development.
 
 \bibliographystyle{./IEEE/IEEEtran}
 \bibliography{report.bib}

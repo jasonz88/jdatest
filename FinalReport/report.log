@@ -1,24 +1,22 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.10.11)  6 MAY 2013 18:38
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.10.9)  6 MAY 2013 21:03
 entering extended mode
-**C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/FinalRe
-port/report.tex
-
-(C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/FinalRep
-ort/report.tex
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**report.tex
+(./report.tex
 LaTeX2e <2011/06/27>
-Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
-abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
-croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, ga
-lician, german, german-x-2009-06-19, greek, gujarati, hindi, hungarian, iceland
-ic, indonesian, interlingua, irish, italian, kannada, kurmanji, lao, latin, lat
-vian, lithuanian, malayalam, marathi, mongolian, mongolianlmc, monogreek, ngerm
-an, ngerman-x-2009-06-19, nynorsk, oriya, panjabi, pinyin, polish, portuguese, 
-romanian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swis
-sgerman, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, u
-senglishmax, welsh, loaded.
-
-(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
-ort\IEEE\IEEEtran.cls
+Babel <v3.8m> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman-x-2012-05-30, ngerman-x-2012-05-30, afrikaans, ancientgreek, ibycus, arabi
+c, armenian, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danis
+h, dutch, ukenglish, usenglishmax, esperanto, estonian, ethiopic, farsi, finnis
+h, french, friulan, galician, german, ngerman, swissgerman, monogreek, greek, h
+ungarian, icelandic, assamese, bengali, gujarati, hindi, kannada, malayalam, ma
+rathi, oriya, panjabi, tamil, telugu, indonesian, interlingua, irish, italian, 
+kurmanji, latin, latvian, lithuanian, mongolian, mongolianlmc, bokmal, nynorsk,
+ polish, portuguese, romanian, romansh, russian, sanskrit, serbian, serbianc, s
+lovak, slovenian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, 
+welsh, loaded.
+(./IEEE/IEEEtran.cls
 
 LaTeX Warning: You have requested document class `./IEEE/IEEEtran',
                but the document class provides `IEEEtran'.
@@ -33,7 +31,7 @@ Document Class: IEEEtran 2007/03/05 V1.7a by Michael Shell
 \@IEEEtrantmptoksA=\toks14
 LaTeX Font Info:    Try loading font information for OT1+ptm on input line 366.
 
-("C:\Program Files\MikTex\tex\latex\psnfss\ot1ptm.fd"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 -- Using 8.5in x 11in (letter) paper.
@@ -106,10 +104,10 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <24> not available
 \@IEEEtmpitemindent=\dimen116
 \c@IEEEbiography=\count90
 \@IEEEtranrubishbin=\box26
-) ("C:\Program Files\MikTex\tex\latex\tools\tabularx.sty"
+) (/usr/local/texlive/2012/texmf-dist/tex/latex/tools/tabularx.sty
 Package: tabularx 1999/01/07 v2.07 `tabularx' package (DPC)
 
-("C:\Program Files\MikTex\tex\latex\tools\array.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/tools/array.sty
 Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \col@sep=\dimen117
 \extrarowheight=\dimen118
@@ -125,7 +123,7 @@ Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 \TX@cols=\count91
 \TX@ftn=\toks16
 )
-("C:\Program Files\MikTex\tex\latex\ulem\ulem.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/generic/ulem/ulem.sty
 \UL@box=\box27
 \UL@hyphenbox=\box28
 \UL@skip=\skip46
@@ -137,14 +135,14 @@ Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
 Package: ulem 2012/05/18
 \ULdepth=\dimen126
 )
-("C:\Program Files\MikTex\tex\latex\tools\verbatim.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/tools/verbatim.sty
 Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
 \every@verbatim=\toks18
 \verbatim@line=\toks19
 \verbatim@in@stream=\read1
 )
-("C:\Program Files\MikTex\tex\latex\listings\listings.sty"
-("C:\Program Files\MikTex\tex\latex\graphics\keyval.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/listings/listings.sty
+(/usr/local/texlive/2012/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks20
 )
@@ -161,32 +159,32 @@ Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \lst@lineno=\count98
 \lst@maxwidth=\dimen130
 
-("C:\Program Files\MikTex\tex\latex\listings\lstmisc.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 \c@lstnumber=\count99
 \lst@skipnumbers=\count100
 \lst@framebox=\box31
 )
-("C:\Program Files\MikTex\tex\latex\listings\listings.cfg"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/listings/listings.cfg
 File: listings.cfg 2007/02/22 1.4 listings configuration
 ))
 Package: listings 2007/02/22 1.4 (Carsten Heinz)
 
-("C:\Program Files\MikTex\tex\latex\xcolor\xcolor.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/xcolor/xcolor.sty
 Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
 
-("C:\Program Files\MikTex\tex\latex\00miktex\color.cfg"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/latexconfig/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package xcolor Info: Driver file: pdftex.def on input line 225.
 
-("C:\Program Files\MikTex\tex\latex\pdftex-def\pdftex.def"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/pdftex-def/pdftex.def
 File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
 
-("C:\Program Files\MikTex\tex\generic\oberdiek\infwarerr.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/infwarerr.sty
 Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
 )
-("C:\Program Files\MikTex\tex\generic\oberdiek\ltxcmds.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
 Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 )
 \Gread@gobject=\count101
@@ -201,7 +199,7 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
 )
-("C:\Program Files\MikTex\tex\latex\base\textcomp.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/base/textcomp.sty
 Package: textcomp 2005/09/27 v1.99g Standard LaTeX package
 Package textcomp Info: Sub-encoding information:
 (textcomp)               5 = only ISO-Adobe without \textcurrency
@@ -216,7 +214,7 @@ Package textcomp Info: Sub-encoding information:
 (textcomp)             See the documentation for details.
 Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 71.
 
-("C:\Program Files\MikTex\tex\latex\base\ts1enc.def"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/base/ts1enc.def
 File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
 )
 LaTeX Info: Redefining \oldstylenums on input line 266.
@@ -282,11 +280,11 @@ Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 338.
 Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 339.
 Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 340.
 )
-("C:\Program Files\MikTex\tex\latex\algorithms\algorithm.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
 
-("C:\Program Files\MikTex\tex\latex\float\float.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count102
 \float@exts=\toks22
@@ -294,13 +292,13 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks23
 \@floatcapt=\box33
 )
-("C:\Program Files\MikTex\tex\latex\base\ifthen.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
 )
 \@float@every@algorithm=\toks24
 \c@algorithm=\count103
 )
-("C:\Program Files\MikTex\tex\latex\algorithms\algorithmic.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/algorithms/algorithmic.sty
 Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
 \c@ALC@unique=\count104
 \c@ALC@line=\count105
@@ -309,25 +307,26 @@ Package: algorithmic 2009/08/24 v0.1 Document Style `algorithmic'
 \ALC@tlm=\skip47
 \algorithmicindent=\skip48
 )
-("C:\Program Files\MikTex\tex\latex\graphics\graphicx.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/graphics/graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files\MikTex\tex\latex\graphics\graphics.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files\MikTex\tex\latex\graphics\trig.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-("C:\Program Files\MikTex\tex\latex\00miktex\graphics.cfg"
-File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
+(/usr/local/texlive/2012/texmf-dist/tex/latex/latexconfig/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
 )
 Package graphics Info: Driver file: pdftex.def on input line 91.
 )
 \Gin@req@height=\dimen131
 \Gin@req@width=\dimen132
 )
-(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
-ort\report.aux)
+(./report.aux)
+\openout1 = `report.aux'.
+
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 44.
 LaTeX Font Info:    ... okay on input line 44.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 44.
@@ -342,13 +341,13 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 44.
 LaTeX Font Info:    ... okay on input line 44.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 44.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 44.
- ("C:\Program Files\MikTex\tex\latex\base\ts1cmr.fd"
+ (/usr/local/texlive/2012/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 44.
 \c@lstlisting=\count108
 
-("C:\Program Files\MikTex\tex\context\base\supp-pdf.mkii"
+(/usr/local/texlive/2012/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count109
 \scratchdimen=\dimen133
@@ -361,9 +360,56 @@ LaTeX Font Info:    ... okay on input line 44.
 \MPnumerator=\count113
 \makeMPintoPDFobject=\count114
 \everyMPtoPDFconversion=\toks26
+) (/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
 )
+
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/local/texlive/2012/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+
+(/usr/local/texlive/2012/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+))
+(/usr/local/texlive/2012/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+
+(/usr/local/texlive/2012/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.jpeg,.png,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/local/texlive/2012/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
 LaTeX Font Info:    Try loading font information for OT1+pcr on input line 45.
- ("C:\Program Files\MikTex\tex\latex\psnfss\ot1pcr.fd"
+
+(/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 Missing character: There is no ‚ in font ptmr7t!
@@ -372,23 +418,17 @@ Missing character: There is no ô in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
-
-
-LaTeX Warning: Citation `VisualVM' on page 1 undefined on input line 63.
-
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
 
-LaTeX Warning: Citation `Emma' on page 1 undefined on input line 70.
-
-("C:\Program Files\MikTex\tex\latex\listings\lstlang1.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
-("C:\Program Files\MikTex\tex\latex\listings\lstlang1.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
-("C:\Program Files\MikTex\tex\latex\listings\lstmisc.sty"
+(/usr/local/texlive/2012/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 )
 Missing character: There is no ‚ in font ptmr7t!
@@ -403,14 +443,10 @@ Missing character: There is no ú in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ù in font ptmr7t!
-
-
-LaTeX Warning: Citation `Javaassist' on page 1 undefined on input line 108.
-
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
-[1{C:/Users/Dongyang/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
+ [1{/usr/local/texlive/2012/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
 ]
@@ -420,7 +456,7 @@ File: JDAtool.png Graphic file (type png)
 Package pdftex.def Info: JDAtool.png used on input line 138.
 (pdftex.def)             Requested size: 247.6778pt x 166.9635pt.
 
-Underfull \hbox (badness 3148) in paragraph at lines 153--157
+Underfull \hbox (badness 3148) in paragraph at lines 144--148
 []\OT1/ptm/m/n/10 The core of all method in-for-ma-tion re-sides in the
  []
 
@@ -433,47 +469,47 @@ Missing character: There is no ô in font ptmr7t!
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
-[2 <C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/Final
-Report/JDAtool.png>]
+[2 <./JDAtool.png>]
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 187.
+(Font)              <7> on input line 221.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 187.
+(Font)              <5> on input line 221.
  <layout_demo2.png, id=15, 231.86626pt x 393.72093pt>
 File: layout_demo2.png Graphic file (type png)
 
 <use layout_demo2.png>
-Package pdftex.def Info: layout_demo2.png used on input line 194.
-(pdftex.def)             Requested size: 115.93283pt x 196.85999pt.
- <layout_demo.png, id=16, 733.23938pt x 433.62pt>
+Package pdftex.def Info: layout_demo2.png used on input line 238.
+(pdftex.def)             Requested size: 258.0pt x 438.13481pt.
+
+Overfull \hbox (6.0pt too wide) in paragraph at lines 238--239
+ [] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<layout_demo.png, id=16, 733.23938pt x 433.62pt>
 File: layout_demo.png Graphic file (type png)
+ <use layout_demo.png>
+Package pdftex.def Info: layout_demo.png used on input line 245.
+(pdftex.def)             Requested size: 258.0pt x 152.57648pt.
 
-<use layout_demo.png>
-Package pdftex.def Info: layout_demo.png used on input line 201.
-(pdftex.def)             Requested size: 241.96974pt x 143.09503pt.
- [3] <gui.png, id=24, 563.85657pt x 308.65312pt>
+Overfull \hbox (6.0pt too wide) in paragraph at lines 245--246
+ [] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<gui.png, id=17, 563.85657pt x 308.65312pt>
 File: gui.png Graphic file (type png)
-
-<use gui.png>
-Package pdftex.def Info: gui.png used on input line 266.
-(pdftex.def)             Requested size: 236.81815pt x 129.63342pt.
+ <use gui.png>
+Package pdftex.def Info: gui.png used on input line 316.
+(pdftex.def)             Requested size: 516.0pt x 282.47606pt.
 Missing character: There is no ‚ in font ptmr7t!
 Missing character: There is no Ä in font ptmr7t!
 Missing character: There is no ô in font ptmr7t!
-
-(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
-ort\report.bbl
-
-! LaTeX Error: Something's wrong--perhaps a missing \item.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.24 \end{thebibliography}
-                          
-? 
-)
+ [3] (./report.bbl)
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -485,35 +521,29 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[4 <C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/javadynamicanalyzer/Final
-Report/layout_demo2.png> <C:/Users/Dongyang/jsworkspace/javadynamicanalyzer/jav
-adynamicanalyzer/FinalReport/layout_demo.png> <C:/Users/Dongyang/jsworkspace/ja
-vadynamicanalyzer/javadynamicanalyzer/FinalReport/gui.png>]
-(C:\Users\Dongyang\jsworkspace\javadynamicanalyzer\javadynamicanalyzer\FinalRep
-ort\report.aux)
-
-LaTeX Warning: There were undefined references.
-
- ) 
+[4 <./gui.png>] [5 <./layout_demo2.png> <./layout_demo.png>] (./report.aux) ) 
 Here is how much of TeX's memory you used:
- 4651 strings out of 494045
- 67526 string characters out of 3149989
- 158549 words of memory out of 3000000
- 7908 multiletter control sequences out of 15000+200000
+ 5010 strings out of 493488
+ 74047 string characters out of 3141347
+ 171124 words of memory out of 3000000
+ 8251 multiletter control sequences out of 15000+200000
  33263 words of font info for 67 fonts, out of 3000000 for 9000
- 715 hyphenation exceptions out of 8191
- 33i,9n,58p,1135b,1035s stack positions out of 5000i,500n,10000p,200000b,50000s
-{C:/Program Files/MikTex/fonts/enc/dvips/fontname/8r.enc}<C:/Program Files/Mi
-kTex/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MikTex/fonts/t
-ype1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MikTex/fonts/type1/public/a
-msfonts/cm/cmsy10.pfb><C:/Program Files/MikTex/fonts/type1/public/amsfonts/cm/c
-msy7.pfb><C:/Program Files/MikTex/fonts/type1/urw/courier/ucrr8a.pfb><C:/Progra
-m Files/MikTex/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files/MikTex/fonts/
-type1/urw/times/utmr8a.pfb><C:/Program Files/MikTex/fonts/type1/urw/times/utmri
-8a.pfb>
-Output written on report.pdf (4 pages, 340789 bytes).
+ 957 hyphenation exceptions out of 8191
+ 37i,9n,58p,278b,1035s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/
+usr/local/texlive/2012/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texli
+ve/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texliv
+e/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/
+2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2
+012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/201
+2/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2012/texmf-
+dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts
+/type1/urw/times/utmr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw
+/times/utmri8a.pfb>
+Output written on report.pdf (5 pages, 336394 bytes).
 PDF statistics:
- 57 PDF objects out of 1000 (max. 8388607)
+ 62 PDF objects out of 1000 (max. 8388607)
+ 38 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
